@@ -1,42 +1,40 @@
 {
-	"Version":"1.0",
-	"mqttServer":"10.10.80.10",
-	"serverPort":5678,
-	"uart0":
-	{
-      "devName":"/dev/ttyO1",
-	   	"BaudRate":115200,
-	   	"transcationName":"solder",
-        	"equipNum":0
-	},
-	"uart1":
-	{
-    "devName":"/dev/ttyO2",
-		"BaudRate":9600,
-		"transcationName":"balance",
-		"equipNum":0
-	},
-	"transcations":[
-        {
-              "name":"balance",
-              "transcationId":110,
-              "peripherals":["uart0","uart1"],
-              "ipWhiteList":["192.168.204.1"]
-        },
-        {
-              "name":"solder",
-              "transcationId":911,
-              "peripherals":["usb0"],
-              "ipWhiteList":["192.168.204.1"]
-        },
-        {
-              "name":"GlueDispenser",
-              "transcationId":11,
-              "peripherals":["usb2"],
-              "ipWhiteList":["192.168.204.1"]
-        }
-	],
-	"balance":["BlanceQp","BalanceCl"],
-	"solder":["GetSpitParam"],
-	"GlueDispenser":["GetSpitParam"]
+  "Version": "1.0",
+
+  "uart1": {
+    "devName": "/dev/ttyO1",
+    "BaudRate": 9600,
+    "equipNum": 0
+  },
+  "uart2": {
+    "devName": "/dev/ttyO2",
+    "BaudRate": 9600,
+    "equipNum": 0
+  },
+  "functions": [
+    {
+      "name": "balance",
+      "peripheral": "uart1",
+      "boss": "plc0"
+    },
+    {
+      "name": "balance",
+      "peripheral": "uart2",
+      "boss": "plc1"
+    }
+  ],
+  "plc0": {
+    "ip": "192.168.101.11",
+    "port": 9600,
+    "mem_group": [
+      {
+      "cmd_addr":"DM15170",
+      "data_addr":"DM15174"
+    },
+    {
+      "cmd_addr":"DM15180",
+      "data_addr":"DM15184"
+    }
+    ]
+  }
 }
