@@ -1,0 +1,1 @@
+./configure --prefix=/home/kt/libevent --host=arm-none-linux CC=arm-none-linux-gnueabi-gcc CXX=arm-none-linux-gnueabi-g++

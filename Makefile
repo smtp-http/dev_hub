@@ -1,0 +1,95 @@
+include env.mak
+
+TOPDIR := $(shell pwd)
+
+LDFLAGS +=  $(TOPDIR)/vendor/$(LIBSDIR)/libevent.a  $(TOPDIR)/vendor/$(LIBSDIR)/libcurl.a $(TOPDIR)/vendor/$(LIBSDIR)/libmosquitto.a $(TOPDIR)/vendor/$(LIBSDIR)/libssl.a $(TOPDIR)/vendor/$(LIBSDIR)/libcrypto.a $(TOPDIR)/vendor/$(LIBSDIR)/libcares.a $(TOPDIR)/vendor/$(LIBSDIR)/libjsoncpp.a  $(TOPDIR)/vendor/$(LIBSDIR)/libfins.a #$(TOPDIR)/vendor/$(LIBSDIR)/libaprutil-1.a $(TOPDIR)/vendor/$(LIBSDIR)/libapr-1.a  
+ifdef TOOLCHAIN_NAME
+	#LDFLAGS += $(TOPDIR)/vendor/$(LIBSDIR)/libexpat.a 
+else
+	LDFLAGS += -lexpat 
+endif
+
+LDFLAGS += -lpthread -ldl  -lstdc++ -lrt  #-lexpat 
+# -std=c++11 -pthread -Wl,--no-as-needed
+
+
+
+INCLUDE_DIR = -I$(TOPDIR)/device -I$(TOPDIR)/equipment  -I$(TOPDIR)/include -I$(TOPDIR)/tools -I$(TOPDIR)/transcation -I$(TOPDIR)/Communication -I$(TOPDIR)/command -I$(TOPDIR)/vendor/libevent-2.0.22-stable/include -I$(TOPDIR)/vendor/jsoncpp/include -I$(TOPDIR)/vendor/log4cxx/include -I$(TOPDIR)/vendor/apr/include -I$(TOPDIR)/vendor/apr-util/include -I$(TOPDIR)/mqtt
+
+################  COMPILE FLAG ########################
+#export CFLAGS := -Wall -g -std=c++11 -Wl,--no-as-needed $(INCLUDE_DIR)
+export CXXFLAGS := -Wall -g -std=c++11 -D_GLIBCXX_USE_NANOSLEEP -Wl,--no-as-needed $(INCLUDE_DIR) -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -O3
+
+TARGET = dev_collecter
+OBJS = Main.o#AppSimulator.o
+
+LOCAL_LIBS :=  ./tools/libtools.a ./mqtt/libmqtt.a ./Communication/libconn.a ./device/libdevice.a  ./equipment/libequipment.a ./transcation/libtranscation.a
+
+#./command/libcommand.a 
+
+LIBSCAN = libscanner.a
+
+
+all : device  equipment tools Communication mqtt transcation $(TARGET)
+#command
+#all : session  inireader $(TARGET)
+
+$(LIBSCAN):$(LOCAL_LIBS)
+	$(AR) cr $@ $^
+
+$(TARGET): $(OBJS) $(LIBSCAN)
+#$(TARGET): $(LIBSCAN)
+	@echo "==== target ======"
+	@echo "Linking $@"
+#	@$(CXX) -o $@ $(LOCAL_LIBS) $(LDFLAGS)
+	@$(CXX) -o $@ $(OBJS) $(LOCAL_LIBS) $(LDFLAGS)
+
+device:
+	@echo "==== device ======"
+	@$(MAKE) -sC $@
+
+mqtt:
+	@echo "==== mqtt ======"
+	@$(MAKE) -sC $@
+
+equipment:
+	@echo "==== equipment ===="
+	@$(MAKE) -sC $@
+
+#SolderCtrl:
+#	@echo "==== SolderCtrl ===="
+#	@$(MAKE) -sC $@
+
+tools:
+	@echo "==== tools ===="
+	@$(MAKE) -sC $@
+
+Communication:
+	@echo "==== Communication ===="
+	@$(MAKE) -sC $@
+
+transcation:
+	@echo "==== transcation ===="
+	@$(MAKE) -sC $@
+
+#command:
+#	@echo "==== command ===="
+#	@$(MAKE) -sC $@
+
+	
+clean:
+	$(MAKE) -sC device clean
+	$(MAKE) -sC tools clean
+	$(MAKE) -sC mqtt clean
+	$(MAKE) -sC Communication clean
+	$(MAKE) -sC equipment clean
+	$(MAKE) -sC transcation clean
+#	$(MAKE) -sC command clean
+	
+	rm -f *.o $(TARGET) $(LIBSCAN)
+
+distclean: clean
+	find -name *.d | xargs rm -f
+	
+.PHONY: all clean device equipment tools mqtt Communication transcation #command
+include rules.mak
