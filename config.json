@@ -15,26 +15,22 @@
     {
       "name": "balance",
       "peripheral": "uart1",
-      "boss": "plc0"
+      "mem_group": {
+          "cmd_addr":"DM15170",
+          "data_addr":"DM15174"
+      }
     },
     {
       "name": "balance",
       "peripheral": "uart2",
-      "boss": "plc1"
+      "mem_group": {
+      "cmd_addr":"DM15180",
+      "data_addr":"DM15184"
+    }
     }
   ],
   "plc0": {
     "ip": "192.168.101.11",
-    "port": 9600,
-    "mem_group": [
-      {
-      "cmd_addr":"DM15170",
-      "data_addr":"DM15174"
-    },
-    {
-      "cmd_addr":"DM15180",
-      "data_addr":"DM15184"
-    }
-    ]
+    "port": 9600
   }
 }

@@ -22,6 +22,11 @@
 #define ERROR_TIMEOUT 4
 #define ERROR_RESULT 6
 
+///////////////////  connectiong status /////////////////
+#define CONNECT_OK  0
+#define CONNECT_NO  1
+
+
 #include <json/json.h>
 
 extern "C"
@@ -30,10 +35,25 @@ extern "C"
 }
 using namespace lux;
 
+class Plc {
+public:
+	Plc(std::string ip,int port);
+	~Plc();
+
+	int Connect();
+	void on_disconnect();
+	friend class PlcFins;
+protected:
+	int m_connectionStatus;
+	std::string m_ip;
+	int m_port;
+	struct fins_sys_tp *m_sys;
+};
+
 
 class PlcFins : public IUpdateSink,public ITimerUserSink {
 public:
-	PlcFins(std::string ip,int port,std::string cmd_addr,std::string data_addr);
+	PlcFins(std::string cmd_addr,std::string data_addr,Plc *plc);
 	~PlcFins();
 
 	int Connect();
@@ -43,17 +63,18 @@ public:
 protected:
 	virtual void OnTimer(TimerID tid);
 
-	std::string m_ip;
-	int m_port;
+	//std::string m_ip;
+	//int m_port;
 	std::string m_cmdAddr;
 	std::string m_dataAddr;
-	struct fins_sys_tp *m_sys;
+	Plc *m_plc;
+	
 	TimerID m_detect;
 	TimerID m_reconnect;
 	TimerID m_valuePolling;
 	Peripheral *m_Peripheral;
 private:
-	void on_disconnect();
+	//void on_disconnect();
 	int m_status;
 	unsigned char m_cmd[5];
 	unsigned char m_data[10];

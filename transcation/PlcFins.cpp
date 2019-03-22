@@ -126,6 +126,48 @@ string& trim(string &s)
 
 
 
+/////////////////////////////////////////////  Plc  ///////////////////////////////////////////////////
+Plc::Plc(string ip,int port)
+	: m_ip(ip)
+	, m_port(port)
+{
+	m_sys = NULL;
+	m_connectionStatus = CONNECT_NO;
+}
+
+
+int Plc::Connect()
+{
+	int error_val;
+	std::cout << "ip:" << m_ip << "  port: " << m_port << std::endl;
+
+	if ( m_connectionStatus == CONNECT_OK) {
+		return 0;
+	}
+
+
+	m_sys = finslib_tcp_connect(NULL, m_ip.c_str(), m_port, 0, 10, 0, 0, 1,0,&error_val, 6);
+	if(m_sys == NULL || error_val != 0) {
+		std::cout << "plc fins connect error!" << endl;
+		m_sys = NULL;
+		return -1;
+	}
+
+	cout << "sys: " << m_sys << endl;
+	m_sys->plc_mode = FINS_MODE_CS;
+	m_connectionStatus = CONNECT_OK;
+
+	return 0;
+}
+
+
+void Plc::on_disconnect()
+{
+	//EventLooper::GetInstance().CancelTimer(m_detect);
+	finslib_disconnect(m_sys);
+	m_sys = NULL;
+	m_connectionStatus = CONNECT_NO;
+}
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,14 +178,13 @@ void convertFromString(T &value, const std::string &s) {
 	ss >> value;
 }
 
-PlcFins::PlcFins(string ip,int port,string cmd_addr,string data_addr)
-	: m_ip(ip)
-	, m_port(port)
-	, m_cmdAddr(cmd_addr)
+PlcFins::PlcFins(string cmd_addr,string data_addr,Plc* plc)
+	: m_cmdAddr(cmd_addr)
 	, m_dataAddr(data_addr)
+	, m_plc(plc)
 {
 	m_status = PLC_STATUS_IDEL;
-	m_sys = NULL;
+	//m_plc->m_sys = NULL;
 	struct timeval tv={5, 0};
 	m_reconnect = EventLooper::GetInstance().ScheduleTimer(&tv, TF_FIRE_PERIODICALLY, this);
 
@@ -168,7 +209,7 @@ void PlcFins::UpdateInfo(const char *buf,int len)
 		//cout << "##1 CancelTimer tid :" << m_valuePolling << endl;
 		short cmd_ret = ERROR_RESULT;
 		unsigned char *ret_cmd = (unsigned char *)(&cmd_ret);
-		int ret = finslib_memory_area_write_word(m_sys,m_cmdAddr.c_str(),ret_cmd,1);
+		int ret = finslib_memory_area_write_word(m_plc->m_sys,m_cmdAddr.c_str(),ret_cmd,1);
 		m_status = PLC_STATUS_IDEL;
 		printf("Error data!\n");
 		return;
@@ -196,32 +237,27 @@ void PlcFins::UpdateInfo(const char *buf,int len)
 	float val;
 	convertFromString(val,valuestr);
 	printf("val:%f\n",val);
-	int ret = finslib_memory_area_write_int32( m_sys, m_dataAddr.c_str(),(int *)(&val), 1 ) ;
+	int ret = finslib_memory_area_write_int32( m_plc->m_sys, m_dataAddr.c_str(),(int *)(&val), 1 ) ;
 	if(ret != FINS_RETVAL_SUCCESS){
-		on_disconnect();
+		m_plc->on_disconnect();
 		return;
 	}
 
 	short cmd_ret = 0;
 	unsigned char *ret_cmd = (unsigned char *)(&cmd_ret);
-	ret = finslib_memory_area_write_word(m_sys,m_cmdAddr.c_str(),ret_cmd,1);
+	ret = finslib_memory_area_write_word(m_plc->m_sys,m_cmdAddr.c_str(),ret_cmd,1);
 	cout << "***************   ret:    "  << ret << "value:" << val << endl;
 	m_status = PLC_STATUS_IDEL;
 }
 
 int PlcFins::Connect()
 {
-	int error_val;
-	std::cout << "ip:" << m_ip << "  port: " << m_port << std::endl;
-	m_sys = finslib_tcp_connect(NULL, m_ip.c_str(), m_port, 0, 10, 0, 0, 1,0,&error_val, 6);
-	if(m_sys == NULL || error_val != 0) {
-		std::cout << "plc fins connect error!" << endl;
-		m_sys = NULL;
-		return -1;
-	}
 
-	cout << "sys: " << m_sys << endl;
-	m_sys->plc_mode = FINS_MODE_CS;
+	int ret;
+	ret = m_plc->Connect();
+	if (ret != 0) {
+		return ret;
+	}
 
 	m_status = PLC_STATUS_IDEL;
 
@@ -239,17 +275,17 @@ void PlcFins::OnTimer(TimerID tid)
 	//cout << "OnTimer " << tid << endl;
 	if (tid == m_detect){
 		if(m_status == PLC_STATUS_IDEL) {
-			if (m_sys){
+			if (m_plc->m_sys){
 				//cout << "m_detect" << endl;
 				//cout << "sys: " << m_sys << "    m_cmdAddr: " << m_cmdAddr << endl; 
 				
-				ret = finslib_memory_area_read_word(m_sys,m_cmdAddr.c_str(),m_cmd,1);
+				ret = finslib_memory_area_read_word(m_plc->m_sys,m_cmdAddr.c_str(),m_cmd,1);
 				unsigned char ch = m_cmd[0];
 				m_cmd[0] = m_cmd[1];
 				m_cmd[1] = ch;                   // da xiao duan tiao zheng.
 				//printf("ret:%d\n",ret);
 				if(ret != FINS_RETVAL_SUCCESS) {
-					on_disconnect();
+					m_plc->on_disconnect();
 					return;
 				}
 				short *cmd = (short *)m_cmd;
@@ -261,7 +297,7 @@ void PlcFins::OnTimer(TimerID tid)
 					// qp cmd is not did anything,return OK
 					short cmd_ret = 0;
 					unsigned char *ret_cmd = (unsigned char *)(&cmd_ret);
-					ret = finslib_memory_area_write_word(m_sys,m_cmdAddr.c_str(),ret_cmd,1);
+					ret = finslib_memory_area_write_word(m_plc->m_sys,m_cmdAddr.c_str(),ret_cmd,1);
 					
 				} else if(*cmd == EBALANCE_CZ){
 					cout << "---------- du shuju" << endl;
@@ -292,9 +328,9 @@ void PlcFins::OnTimer(TimerID tid)
 				//cout << "##3 CancelTimer tid :" << m_valuePolling << endl;
 				short error_cmd = ERROR_TIMEOUT;
 				unsigned char *ret_cmd = (unsigned char *)(&error_cmd);
-				ret = finslib_memory_area_write_word(m_sys,m_cmdAddr.c_str(),ret_cmd,1);
+				ret = finslib_memory_area_write_word(m_plc->m_sys,m_cmdAddr.c_str(),ret_cmd,1);
 				if(ret != FINS_RETVAL_SUCCESS) {
-					on_disconnect();
+					m_plc->on_disconnect();
 					return;
 				}
 				m_status = PLC_STATUS_IDEL;
@@ -303,7 +339,7 @@ void PlcFins::OnTimer(TimerID tid)
 
 	} else if (tid == m_reconnect) {
 		//cout << "m_reconnect_timer" << endl;
-		if ( m_sys == NULL) {
+		if ( m_plc->m_sys == NULL) {
 			cout << "m_reconnect" << endl;
 			Connect();
 		}
@@ -317,10 +353,3 @@ void PlcFins::OnTimer(TimerID tid)
 }
 
 
-
-void PlcFins::on_disconnect()
-{
-	EventLooper::GetInstance().CancelTimer(m_detect);
-	finslib_disconnect(m_sys);
-	m_sys = NULL;
-}

@@ -43,6 +43,30 @@ void FunctionManager::Update(const Json::Value &value)
 		return;
 	}
 
+	Json::Value plcValue = value["plc0"];
+	if(plcValue.isNull()){
+		printf("Can not find this plc %s\n","plc0");
+		return;
+	}
+
+	string plc_ip;
+	if(!plcValue["ip"].isNull()  && plcValue["ip"].isString()) {
+		plc_ip = plcValue["ip"].asString();
+	} else {
+		printf("Ip error!\n");
+		return;
+	}
+
+	int plc_port;
+	if(!plcValue["port"].isNull()  && plcValue["port"].isInt()) {
+		plc_port = plcValue["port"].asInt();
+	} else {
+		printf("port error!\n");
+		return;
+	}
+
+	Plc *plc = new Plc(plc_ip,plc_port);
+
 
 	Json::Value arrayFunction  = value["functions"];
 
@@ -66,42 +90,11 @@ void FunctionManager::Update(const Json::Value &value)
 			continue;
 		}
 
-
-		Json::Value boss = arrayFunction[i]["boss"];
-		string bossName;
-		if(!boss.isNull() && boss.isString()){
-			bossName = boss.asString(); 
-		} else {
-			//log.Log(true,LOGGER_ERROR,"arrayEquipment[%d] is null or is not string type, [%s][%s][%d]",j,__FILE__,__PRETTY_FUNCTION__,__LINE__);
-			continue;
-		}
-
-		Json::Value plcValue = value[bossName];
-		if(plcValue.isNull()){
-			printf("Can not find this plc %s\n",bossName.c_str());
-			continue;
-		}
-
-		string plc_ip;
-		if(!plcValue["ip"].isNull()  && plcValue["ip"].isString()) {
-			plc_ip = plcValue["ip"].asString();
-		} else {
-			printf("Ip error!\n");
-			continue;
-		}
-
-		int plc_port;
-		if(!plcValue["port"].isNull()  && plcValue["port"].isInt()) {
-			plc_port = plcValue["port"].asInt();
-		} else {
-			printf("port error!\n");
-			continue;
-		}
-
+		Json::Value mem_group = arrayFunction[i]["mem_group"];
 
 		string plc_cmdAddr;
-		if(!plcValue["cmd_addr"].isNull()  && plcValue["cmd_addr"].isString()) {
-			plc_cmdAddr = plcValue["cmd_addr"].asString();
+		if(!mem_group["cmd_addr"].isNull()  && mem_group["cmd_addr"].isString()) {
+			plc_cmdAddr = mem_group["cmd_addr"].asString();
 		} else {
 			printf("cmd_addr error!\n");
 			continue;
@@ -109,14 +102,14 @@ void FunctionManager::Update(const Json::Value &value)
 
 
 		string plc_dataAddr;
-		if(!plcValue["data_addr"].isNull()  && plcValue["data_addr"].isString()) {
-			plc_dataAddr = plcValue["data_addr"].asString();
+		if(!mem_group["data_addr"].isNull()  && mem_group["data_addr"].isString()) {
+			plc_dataAddr = mem_group["data_addr"].asString();
 		} else {
 			printf("data_addr error!\n");
 			continue;
 		}
 
-		PlcFins *plc = new PlcFins(plc_ip,plc_port,plc_cmdAddr,plc_dataAddr);
+		PlcFins *plcFins = new PlcFins(plc_cmdAddr,plc_dataAddr,plc);
 
 		
 		Json::Value peripheral = arrayFunction[i]["peripheral"];
@@ -165,12 +158,12 @@ void FunctionManager::Update(const Json::Value &value)
 
 				
 			if (funcName == "solder") {
-				equipment = BuildSolderCtrl(equipNum,plc);
+				equipment = BuildSolderCtrl(equipNum,plcFins);
 			} else if ( funcName == "balance" ) {
-				equipment = BuildElecBalance(equipNum,plc);
+				equipment = BuildElecBalance(equipNum,plcFins);
 			} else if (funcName == "GlueDispenser") {
 				cout << "==========================    glue +++++++++++++++++++++" << endl;
-				equipment = BuildGlueDispenser(equipNum,plc);
+				equipment = BuildGlueDispenser(equipNum,plcFins);
 				//printf("-------- equitment: 0x%x\n",equipment);
 			}
 
@@ -184,7 +177,7 @@ void FunctionManager::Update(const Json::Value &value)
 
 			uart->SetEquipmentNo(equipNum);
 				
-			plc->SetPeripheral(uart);
+			plcFins->SetPeripheral(uart);
 		} else if (strncmp(peripheralName.c_str(),"usb",3) == 0) {
 				
 		} else {
