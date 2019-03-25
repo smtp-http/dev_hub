@@ -101,6 +101,7 @@ void FunctionManager::Update(const Json::Value &value)
 		}
 
 
+
 		string plc_dataAddr;
 		if(!mem_group["data_addr"].isNull()  && mem_group["data_addr"].isString()) {
 			plc_dataAddr = mem_group["data_addr"].asString();
@@ -110,6 +111,8 @@ void FunctionManager::Update(const Json::Value &value)
 		}
 
 		PlcFins *plcFins = new PlcFins(plc_cmdAddr,plc_dataAddr,plc);
+
+		cout << "plcfins:" << plcFins << "cmd addr: " << plc_cmdAddr << "   data addr: " << plc_dataAddr << endl;
 
 		
 		Json::Value peripheral = arrayFunction[i]["peripheral"];

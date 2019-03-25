@@ -186,10 +186,20 @@ PlcFins::PlcFins(string cmd_addr,string data_addr,Plc* plc)
 	m_status = PLC_STATUS_IDEL;
 	//m_plc->m_sys = NULL;
 	struct timeval tv={5, 0};
+	
 	m_reconnect = EventLooper::GetInstance().ScheduleTimer(&tv, TF_FIRE_PERIODICALLY, this);
+	//cout << "### create reconnect timer: " << this <<   "   timerID: " << m_reconnect << endl;
 
 	struct timeval tv1={1, 0};
+	
 	m_valuePolling = EventLooper::GetInstance().ScheduleTimer(&tv1, TF_FIRE_PERIODICALLY, this);
+	//cout << "### create value polling timer: " << this <<   "   timerID: " << m_valuePolling << endl;
+
+	m_status = PLC_STATUS_IDEL;
+
+	struct timeval tv2={0, 200};
+
+	m_detect = EventLooper::GetInstance().ScheduleTimer(&tv2, TF_FIRE_PERIODICALLY, this);
 }
 
 PlcFins::~PlcFins()
@@ -260,10 +270,14 @@ int PlcFins::Connect()
 	}
 
 	m_status = PLC_STATUS_IDEL;
+/*
+	m_status = PLC_STATUS_IDEL;
 
 	struct timeval tv={0, 200};
-	m_detect = EventLooper::GetInstance().ScheduleTimer(&tv, TF_FIRE_PERIODICALLY, this);
 
+	m_detect = EventLooper::GetInstance().ScheduleTimer(&tv, TF_FIRE_PERIODICALLY, this);
+	//cout << "### create detect timer: " << this <<   "   timerID: " << m_detect << endl;
+*/
 	return 0;
 }
 
@@ -274,11 +288,10 @@ void PlcFins::OnTimer(TimerID tid)
 	int ret;
 	//cout << "OnTimer " << tid << endl;
 	if (tid == m_detect){
+
 		if(m_status == PLC_STATUS_IDEL) {
 			if (m_plc->m_sys){
-				//cout << "m_detect" << endl;
-				//cout << "sys: " << m_sys << "    m_cmdAddr: " << m_cmdAddr << endl; 
-				
+		
 				ret = finslib_memory_area_read_word(m_plc->m_sys,m_cmdAddr.c_str(),m_cmd,1);
 				unsigned char ch = m_cmd[0];
 				m_cmd[0] = m_cmd[1];
@@ -289,6 +302,7 @@ void PlcFins::OnTimer(TimerID tid)
 					return;
 				}
 				short *cmd = (short *)m_cmd;
+				//cout << this << " : " << this->m_cmdAddr << "  cmd:" << *cmd << endl;
 				if(*cmd == EBALANCE_QP) {
 					cout << "----------- qu pi!" << endl;
 					string QPcmd = "%ET";  //去皮
@@ -338,7 +352,7 @@ void PlcFins::OnTimer(TimerID tid)
 		}
 
 	} else if (tid == m_reconnect) {
-		//cout << "m_reconnect_timer" << endl;
+		//cout << "m_reconnect_timer: " << this << endl;
 		if ( m_plc->m_sys == NULL) {
 			cout << "m_reconnect" << endl;
 			Connect();
