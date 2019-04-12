@@ -1,9 +1,45 @@
 #include "station.h"
 #include "tinyxml.h"
+#include <iostream>
 
 
 int GetEventProfile(StationEventProfile_t *event,TiXmlNode *StationEventProfileNode)
 {
+
+	TiXmlElement* profileElement = StationEventProfileNode->ToElement();
+
+	if(!strcmp(profileElement->Value(),"Name")) {
+		event->Name = profileElement->GetText();
+	} else if(!strcmp(profileElement->Value(),"Enable")) {
+
+		string EnableStr = profileElement->GetText();
+		if(!strcmp(EnableStr.c_str(),"true")) {
+			event->Enable = true;
+		} else if (!strcmp(EnableStr.c_str(),"false")) {
+			event->Enable = false;
+		}
+	} else if(!strcmp(profileElement->Value(),"UpdateTimeTicks")) {
+		string ticks = profileElement->GetText();
+		event->UpdateTimeTicks = strtoull (ticks.c_str(), NULL, 0);
+	} else if(!strcmp(profileElement->Value(),"Flag")) {
+		event->Flag = profileElement->GetText();
+	}else if(!strcmp(profileElement->Value(),"PlcBlockAddress")) {
+		string addr = profileElement->GetText();
+		event->PlcBlockAddress = strtoul(addr.c_str(), NULL, 10);
+		
+	}else if(!strcmp(profileElement->Value(),"PlcBlockSize")) {
+		string size = profileElement->GetText();
+		event->PlcBlockSize = strtoul(size.c_str(), NULL, 10);
+	}else if(!strcmp(profileElement->Value(),"EapBlockAddress")) {
+		string addr = profileElement->GetText();
+		event->EapBlockAddress = strtoul(addr.c_str(), NULL, 10);
+		//cout << "**********---------" << profileElement->Value() << ": " << event->EapBlockAddress << endl;
+	}else if(!strcmp(profileElement->Value(),"EapBlockSize")) {
+		string addr = profileElement->GetText();
+		event->EapBlockSize = strtoul(addr.c_str(), NULL, 10);
+	} else{
+		return -1;
+	}
 
 	return 0;
 }
@@ -137,16 +173,13 @@ vector<StationEventProfile_t*> *GetAllStationEventProfile(string xmlFile)
 													if(!strcmp(EventsNode->Value(),"StationEventProfile")) {
 														StationEventProfileElement = EventsNode->ToElement();
 														StationEventProfileNode = StationEventProfileElement->FirstChildElement();
+														StationEventProfile_t *ev_profile = new(StationEventProfile_t);
 														for(;StationEventProfileNode != NULL;StationEventProfileNode = StationEventProfileNode->NextSibling()) {
-															printf("=== StationEventProfileNode: 0x%x   %s\n",StationEventProfileNode,StationEventProfileNode->Value()); 
+															printf("==++++++= StationEventProfileNode: 0x%x   %s***** ==== ***** \n",StationEventProfileNode,StationEventProfileNode->Value()); 
 															// TODO: ======= create station event profile =============
-															StationEventProfile_t *ev_profile = new(StationEventProfile_t);
-															if(GetEventProfile(ev_profile,StationEventProfileNode) != 0) {
-																continue;
-															} else {
-																vs->push_back(ev_profile);
-															}
+															GetEventProfile(ev_profile,StationEventProfileNode);
 														}
+														vs->push_back(ev_profile);
 													}
 												}
 											}
@@ -199,17 +232,13 @@ vector<StationEventProfile_t*> *GetAllStationEventProfile(string xmlFile)
 															if(!strcmp(EventsNode->Value(),"StationEventProfile")) {
 																StationEventProfileElement = EventsNode->ToElement();
 																StationEventProfileNode = StationEventProfileElement->FirstChildElement();
+																StationEventProfile_t *ev_profile = new(StationEventProfile_t);
 																for(;StationEventProfileNode != NULL;StationEventProfileNode = StationEventProfileNode->NextSibling()) {
-																	printf("StationEventProfileNode---2: 0x%x   %s\n",StationEventProfileNode,StationEventProfileNode->Value()); 
+																	printf("StationEventProfileNode---2: 0x%x   %s =====---====\n",StationEventProfileNode,StationEventProfileNode->Value()); 
 																	// TODO: ======= create station event profile =============
-																	StationEventProfile_t *ev_profile = new(StationEventProfile_t);
-																	if(GetEventProfile(ev_profile,StationEventProfileNode) != 0) {
-																		continue;
-																	} else {
-																		vs->push_back(ev_profile);
-																	}
-
+																	GetEventProfile(ev_profile,StationEventProfileNode);
 																}
+																vs->push_back(ev_profile);
 															}
 														}
 													}

@@ -7,7 +7,7 @@ typedef struct StationEventProfile
 {
 	string Name;
 	bool Enable;
-	long long UpdateTimeTicks;
+	unsigned long long UpdateTimeTicks;
 	string Action;
 	string Flag;
 	int PlcBlockAddress;        // port
