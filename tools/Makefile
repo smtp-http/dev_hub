@@ -6,7 +6,7 @@ CFLAGS := -Wall -g  $(INCLUDE_DIR)
 TARGET = libtools.a
 
 #OBJS += ut_misc.o ut_log.o ut_signal.o ut_sds.o ut_title.o
-OBJS += ThreadPool.o ut_misc.o ut_log.o ut_signal.o ut_sds.o ut_title.o config.o
+OBJS += ThreadPool.o ut_misc.o ut_log.o ut_signal.o ut_sds.o ut_title.o config.o tinystr.o tinyxml.o station.o tinyxmlerror.o tinyxmlparser.o 
 all : $(TARGET)
 
 $(TARGET): $(OBJS)
