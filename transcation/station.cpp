@@ -11,7 +11,6 @@ int GetEventProfile(StationEventProfile_t *event,TiXmlNode *StationEventProfileN
 	if(!strcmp(profileElement->Value(),"Name")) {
 		event->Name = profileElement->GetText();
 	} else if(!strcmp(profileElement->Value(),"Enable")) {
-
 		string EnableStr = profileElement->GetText();
 		if(!strcmp(EnableStr.c_str(),"true")) {
 			event->Enable = true;
@@ -23,17 +22,17 @@ int GetEventProfile(StationEventProfile_t *event,TiXmlNode *StationEventProfileN
 		event->UpdateTimeTicks = strtoull (ticks.c_str(), NULL, 0);
 	} else if(!strcmp(profileElement->Value(),"Flag")) {
 		event->Flag = profileElement->GetText();
+	} else if(!strcmp(profileElement->Value(),"Action")) {
+		event->Action = profileElement->GetText();
 	}else if(!strcmp(profileElement->Value(),"PlcBlockAddress")) {
 		string addr = profileElement->GetText();
 		event->PlcBlockAddress = strtoul(addr.c_str(), NULL, 10);
-		
 	}else if(!strcmp(profileElement->Value(),"PlcBlockSize")) {
 		string size = profileElement->GetText();
 		event->PlcBlockSize = strtoul(size.c_str(), NULL, 10);
 	}else if(!strcmp(profileElement->Value(),"EapBlockAddress")) {
 		string addr = profileElement->GetText();
 		event->EapBlockAddress = strtoul(addr.c_str(), NULL, 10);
-		//cout << "**********---------" << profileElement->Value() << ": " << event->EapBlockAddress << endl;
 	}else if(!strcmp(profileElement->Value(),"EapBlockSize")) {
 		string addr = profileElement->GetText();
 		event->EapBlockSize = strtoul(addr.c_str(), NULL, 10);
@@ -255,7 +254,5 @@ vector<StationEventProfile_t*> *GetAllStationEventProfile(string xmlFile)
 		}
 	}
 
-
-	delete vs;
-	return NULL;
+	return vs;
 }
