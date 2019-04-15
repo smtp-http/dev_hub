@@ -22,8 +22,10 @@ int GetEventProfile(StationEventProfile_t *event,TiXmlNode *StationEventProfileN
 		event->UpdateTimeTicks = strtoull (ticks.c_str(), NULL, 0);
 	} else if(!strcmp(profileElement->Value(),"Flag")) {
 		event->Flag = profileElement->GetText();
-	} else if(!strcmp(profileElement->Value(),"Action")) {
+	} else if(!strcmp(profileElement->Value(),"Action")) { 
 		event->Action = profileElement->GetText();
+	} else if(!strcmp(profileElement->Value(),"Properties")) {
+		event->Properties = profileElement->GetText();
 	}else if(!strcmp(profileElement->Value(),"PlcBlockAddress")) {
 		string addr = profileElement->GetText();
 		event->PlcBlockAddress = strtoul(addr.c_str(), NULL, 10);
@@ -178,7 +180,11 @@ vector<StationEventProfile_t*> *GetAllStationEventProfile(string xmlFile)
 															// TODO: ======= create station event profile =============
 															GetEventProfile(ev_profile,StationEventProfileNode);
 														}
-														vs->push_back(ev_profile);
+														if(!strcmp(ev_profile->Properties.c_str(),"NoPlcEvent")){
+															delete ev_profile;
+														} else {
+															vs->push_back(ev_profile);
+														}
 													}
 												}
 											}
@@ -237,7 +243,11 @@ vector<StationEventProfile_t*> *GetAllStationEventProfile(string xmlFile)
 																	// TODO: ======= create station event profile =============
 																	GetEventProfile(ev_profile,StationEventProfileNode);
 																}
-																vs->push_back(ev_profile);
+																if(!strcmp(ev_profile->Properties.c_str(),"NoPlcEvent")){
+																	delete ev_profile;
+																} else {
+																	vs->push_back(ev_profile);
+																}
 															}
 														}
 													}

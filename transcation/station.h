@@ -10,11 +10,13 @@ typedef struct StationEventProfile
 	unsigned long long UpdateTimeTicks;
 	string Action;
 	string Flag;
-	int PlcBlockAddress;        // port
+	string Properties;
+	int PlcBlockAddress;        // 
 	unsigned int PlcBlockSize;
-	int EapBlockAddress;        // port
+	int EapBlockAddress;        // 
 	unsigned int EapBlockSize;
 } StationEventProfile_t;
+
 
 
 vector<StationEventProfile_t*> *GetAllStationEventProfile(string xmlFile);
