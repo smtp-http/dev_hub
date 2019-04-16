@@ -453,3 +453,32 @@ vector<LineMachine_t*> *GetLineMachineList(string xmlFile)
 
 	return lm;
 }
+
+vector<LineStation_t*> *GetLineSectionList(TiXmlNode *node)
+{
+	vector<LineStation_t*>* sectionList = new vector<LineStation_t*>;
+
+
+
+	return sectionList;
+}
+
+LineStationDesiginProfile_t* GetLineStationDesiginProfile(string xmlFile)
+{
+	LineStationDesiginProfile_t* lsdp = new LineStationDesiginProfile_t;
+
+	TiXmlDocument doc(xmlFile.c_str() );
+	bool loadOkay = doc.LoadFile();
+
+	if ( !loadOkay ){
+		printf( "Could not load test file 'demotest.xml'..\n" );
+		delete lsdp;
+		return NULL;
+	}
+
+
+	TiXmlPrinter printer;
+	doc.Accept( &printer );
+
+	return lsdp;
+}

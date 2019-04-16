@@ -1,3 +1,6 @@
+#ifndef __STATION_H__
+#define __STATION_H__
+
 #include <string>
 #include <vector> 
 
@@ -96,6 +99,20 @@ typedef struct LineMachine
 }LineMachine_t;
 
 
+typedef struct LineSection
+{
+	std::string Name;
+}LineSection_t;
+
+
+typedef struct LineStationDesiginProfile
+{
+	
+}LineStationDesiginProfile_t;
 
 
 vector<LineMachine_t*> *GetLineMachineList(string xmlFile);
+
+LineStationDesiginProfile_t* GetLineStationDesiginProfile(std::string xmlFile);
+
+#endif

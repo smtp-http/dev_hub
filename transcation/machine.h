@@ -3,12 +3,19 @@
 
 #include <map>
 #include <string>
+#include "station.h"
+
 
 class Machine 
 {
 public:
 	Machine();
 	~Machine();
+
+protected:
+	std::map<std::string,StationEventProfile_t*> m_mainEvents;
+	std::map<std::string,StationEventProfile_t*> m_stationsEvents;
+	LineMachine_t *m_machine;
 };
 
 
@@ -53,18 +60,20 @@ public:
 	~PlcDirector();
 };
 
+
+
 class MachineScheduler 
 {
 public:
-	MachineScheduler();
+	MachineScheduler(std::string);
 	~MachineScheduler();
-	static MachineScheduler& GetInstance();
+	static MachineScheduler& GetInstance(std::string xmlFile);
 
 private:
 	void FlashLineMachineList();
 
-private:
 	Director *m_plcDirector;
+	std::string m_xmlFile;
 };
 
 
