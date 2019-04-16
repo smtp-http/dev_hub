@@ -3,6 +3,8 @@
 
 using namespace std;
 
+
+
 typedef struct StationEventProfile
 {
 	string Name;
@@ -17,6 +19,83 @@ typedef struct StationEventProfile
 	unsigned int EapBlockSize;
 } StationEventProfile_t;
 
+typedef struct ProtocolInfo
+{
+	string Protocol;
+}ProtocolInfo_t;
+
+typedef struct Settings
+{
+	string Flag;
+	string BeginAddress;
+	unsigned int DataSize;
+}Settings_t;
 
 
-vector<StationEventProfile_t*> *GetAllStationEventProfile(string xmlFile);
+typedef struct MainDeviceProfile
+{
+	string Name;
+	bool Enable;
+	unsigned long long UpdateTimeTicks;
+	string DeviceType;
+	ProtocolInfo_t protocolInfo;
+	string Priority;
+	unsigned long ProcessTimeout;
+	unsigned int Port;
+	unsigned int WriteBufferSize;
+	unsigned int WriteTimeout;
+	unsigned int WriteRetryCount;
+	unsigned long ReadTimeout;
+	unsigned int ReadBufferSize;
+	unsigned int KeepAliveInterval;
+	string SockType;
+	bool IsQueueMode;
+	unsigned int RoutePort;
+	unsigned int AutoReconnectInterval;
+	string IpAddress;
+	unsigned int PollFrequency;
+	unsigned int HeartBeatFrequency;
+	Settings_t NormalSettings;
+	Settings_t MotorSettings;
+	Settings_t PlcDataBlock;
+	Settings_t EapDataBlock;
+	vector<StationEventProfile_t*> mainEvents;
+
+	string DataFormat;
+}MainDeviceProfile_t;
+
+
+typedef struct LineStation
+{
+	string Name;
+	bool Enable;
+	unsigned long long UpdateTimeTicks;
+	unsigned int MaxInputCacheCarrierCount;
+	unsigned int MaxOutputCacheCarrierCount;
+	string Properties;
+	vector<StationEventProfile_t*> Events;   // custom events
+}LineStation_t;;
+
+
+typedef struct LineMachine
+{
+	string Name;
+	bool   Enable;
+	unsigned long long UpdateTimeTicks;
+	MainDeviceProfile_t mainDeviceProfile;
+
+	vector<StationEventProfile_t*> *p_mainEvents;
+
+
+	unsigned int CarrierSlotCount;
+	unsigned int TraySlotCount;
+	unsigned int Uph;
+	vector<LineStation_t*> Stations;
+
+	//vector<StationEventProfile_t*> *p_customEvents;
+}LineMachine_t;
+
+
+
+
+vector<LineMachine_t*> *GetLineMachineList(string xmlFile);
