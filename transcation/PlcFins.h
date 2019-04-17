@@ -63,8 +63,6 @@ public:
 protected:
 	virtual void OnTimer(TimerID tid);
 
-	//std::string m_ip;
-	//int m_port;
 	std::string m_cmdAddr;
 	std::string m_dataAddr;
 	Plc *m_plc;
@@ -73,8 +71,9 @@ protected:
 	TimerID m_reconnect;
 	TimerID m_valuePolling;
 	Peripheral *m_Peripheral;
+	
 private:
-	//void on_disconnect();
+	
 	int m_status;
 	unsigned char m_cmd[5];
 	unsigned char m_data[10];
