@@ -126,6 +126,6 @@ typedef struct LineStationDesiginProfile
 
 //vector<LineMachine_t*> *GetLineMachineList(string xmlFile);
 
-LineStationDesiginProfile_t* GetLineStationDesiginProfile(std::string xmlFile);
+//
 
 #endif
