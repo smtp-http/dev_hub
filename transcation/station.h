@@ -101,17 +101,30 @@ typedef struct LineMachine
 
 typedef struct LineSection
 {
-	std::string Name;
+	string Name;
+	bool Enable;
+	unsigned long long UpdateTimeTicks;
+	string SectionID;
+	bool ReadOnly;
+	vector<LineMachine_t*> *Machines;
 }LineSection_t;
 
 
 typedef struct LineStationDesiginProfile
 {
-	
+	string Assembly;
+	string PluginName;
+	string Version;
+	bool Enable;
+	bool AutoLoaded;
+	vector<LineSection_t*> *LineSections;
+	unsigned int DefaultCarrierSlotCount;
+	unsigned int DefaultTraySlotCount;
+
 }LineStationDesiginProfile_t;
 
 
-vector<LineMachine_t*> *GetLineMachineList(string xmlFile);
+//vector<LineMachine_t*> *GetLineMachineList(string xmlFile);
 
 LineStationDesiginProfile_t* GetLineStationDesiginProfile(std::string xmlFile);
 
