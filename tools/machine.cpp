@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <stdio.h>
 #include "machine.h"
 #include "station.h"
 
@@ -18,13 +19,7 @@ Machine::~Machine()
 }
 
 
-
-
-
-
-
-
-
+//=================================
 
 PlcMachine::PlcMachine()
 {
@@ -33,6 +28,29 @@ PlcMachine::PlcMachine()
 
 PlcMachine::~PlcMachine()
 {
+	
+}
+
+////////////////////////////////////////////////////  Builder //////////////////////////////////////////////////////////////
+
+
+//==============================
+
+void MachinePlcBuilder::BuildMainDeviceProfile(MainDeviceProfile_t *mainDevPro)
+{
+	if (m_machine == NULL){
+		m_machine = new PlcMachine;
+	}
+
+	//m_machine
+}
+
+void MachinePlcBuilder::BuildMainEvents(vector<StationEventProfile_t*>* mainEvList)
+{
+	if (m_machine == NULL){
+		m_machine = new PlcMachine;
+	}
+
 	
 }
 
@@ -48,12 +66,33 @@ Director::~Director()
 	
 }
 
+void Director::ConstructMachine(LineMachine_t* lineMachine)
+{
+	if (lineMachine == NULL) {
+		printf("line machine NULL!\n");
+		return;
+	}
+	
+	m_builder->BuildMainEvents(lineMachine->p_mainEvents);
+	m_builder->BuildMainDeviceProfile(&lineMachine->mainDeviceProfile);
+
+	Machine* mc = m_builder->GetMachine();
+	if(mc == NULL){
+		printf("machine is null: 0x%x\n",mc);
+		return;
+	}
+	
+	m_machines[mc->GetName()] = mc;
+	m_builder->SetMachine(NULL);
+}
+
+
+
 
 ///////////////////////////////////////////////////  MachineScheduler /////////////////////////////////////////////////////
 
 
 MachineScheduler::MachineScheduler(string xmlFile)
-	: m_xmlFile(xmlFile)
 {
 	m_plcDirector = new PlcDirector(new MachinePlcBuilder());
 	this->FlashLineMachineList();
@@ -76,19 +115,14 @@ void ShowVec(const vector<StationEventProfile_t*>& valList);
 void MachineScheduler::FlashLineMachineList()
 {
 	LineStationDesiginProfile_t *ls = GetLineStationDesiginProfile("demotest.xml");
-	vector<LineSection_t*> *LineSections;
+	
 	for (vector<LineSection_t*>::const_iterator iter_sec = ls->LineSections->begin();iter_sec != ls->LineSections->end();iter_sec++) {
+		m_sections[(*iter_sec)->Name] = *iter_sec;
 		vector<LineMachine_t*>* lm_list = (*iter_sec)->Machines;//GetLineMachineList(m_xmlFile);
 		if(lm_list!=NULL){
 			for (vector<LineMachine_t*>::const_iterator iter = lm_list->begin(); iter != lm_list->end(); iter++){
-				cout << "================ main events ==================" << endl;
-				ShowVec(*(*iter)->p_mainEvents); //main events
-
-				for (vector<LineStation_t*>::const_iterator ils = (*iter)->Stations.begin(); ils != (*iter)->Stations.end(); ils++){
-					cout << "+++++++++ station ++++++" << endl;
-					ShowVec((*ils)->Events); //main events
-				}
-
+				LineMachine_t* lineMachine = *iter;
+				m_plcDirector->ConstructMachine(lineMachine);
 			}
 		}
 	}

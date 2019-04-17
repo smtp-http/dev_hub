@@ -72,8 +72,8 @@ vector<LineMachine_t*> *GetLineMachineList(TiXmlNode *MachineNode)
 
 	TiXmlElement* LineMachineElement = NULL;
 	TiXmlElement* MainDeviceProfileElement = NULL;
-	TiXmlElement* todoElement = 0;
-	TiXmlElement* itemElement = 0;
+	//TiXmlElement* todoElement = 0;
+	//TiXmlElement* itemElement = 0;
 	TiXmlElement* SettingsElement = NULL;
 
 	TiXmlElement* EventsElement = NULL;
