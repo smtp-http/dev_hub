@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include "station.h"
+#include "ev_respond.h"
 
 
 class Machine 
@@ -18,10 +19,12 @@ protected:
 	std::map<std::string,StationEventProfile_t*> m_mainEvents;
 	std::map<std::string,StationEventProfile_t*> m_stationsEvents;
 	std::map<std::string,LineStation_t*> m_stations;
+
+	void SetEvUpdater(IEventUpdater* eu){m_evUpdater = eu;}
 	
 private:
 	std::string m_name;
-
+	IEventUpdater* m_evUpdater;
 };
 
 

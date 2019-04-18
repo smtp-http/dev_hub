@@ -23,7 +23,8 @@ Machine::~Machine()
 
 PlcMachine::PlcMachine()
 {
-
+	ev_reciver& er = ev_reciver::GetInstance();
+	this->SetEvUpdater(&er);
 }
 
 PlcMachine::~PlcMachine()
