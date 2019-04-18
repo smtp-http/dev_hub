@@ -1,7 +1,8 @@
 #ifndef __EV_RESPOND_H__
 #define __EV_RESPOND_H__
 
-#include<string>
+#include <string>
+#include "TcpClient.h"
 
 class IEventUpdater
 {
@@ -15,12 +16,12 @@ public:
 	ev_reciver();
 	~ev_reciver();
 
-	ev_reciver& GetInstance();
+	static ev_reciver& GetInstance();
 	virtual void UpdateEvent(std::string sectionName,std::string machineName,std::string eventName);
+
+private:
+	TcpClient* m_client;
 };
-
-
-
 
 
 
