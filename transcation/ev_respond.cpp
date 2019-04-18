@@ -1,13 +1,14 @@
 
 #include "ev_respond.h"
 
-
+using namespace std;
 
 ///////////////////////////////// ev_reciver ////////////////////////////
 
 ev_reciver::ev_reciver()
+	: m_client(NULL)
 {
-
+	return;
 }
 
 ev_reciver::~ev_reciver()
