@@ -23,7 +23,7 @@
 #include "FunctionManager.h"
 //#include "Log4cxxWrapper.h"
 
-
+#include "station.h"
 
 extern "C"
 {
@@ -123,6 +123,7 @@ void TranscationTest()
 }
 */
 
+void ShowVec(const vector<StationEventProfile_t*>& valList){    for (vector<StationEventProfile_t*>::const_iterator iter = valList.begin(); iter != valList.end(); iter++)    {        cout << (*iter)->Name;        cout << " -" << (*iter)->Enable;        cout << " -" << (*iter)->UpdateTimeTicks;        cout << " -" << (*iter)->Action;        cout << " -" << (*iter)->Flag;        cout << " -" << (*iter)->PlcBlockAddress;        cout << " -" << (*iter)->PlcBlockSize;        cout << " -" << (*iter)->EapBlockAddress;        cout << " -" << (*iter)->EapBlockSize << endl;    }}
 
 
 //void transcationTest();
@@ -136,9 +137,13 @@ void transcationTest()
 }
 
 
-
+#include "machine.h"
 int main(int argc, char **argv)
 {
+	MachineScheduler& m = MachineScheduler::GetInstance("demotest.xml");
+
+#if 0
+	vector<StationEventProfile_t*> *m = GetAllStationEventProfile("demotest.xml");
 	//TranscationManager &tm = TranscationManager::GetInstance();
 	FunctionManager &fm = FunctionManager::GetInstance();
 
@@ -171,6 +176,7 @@ int main(int argc, char **argv)
 	cout << "======***====" << endl;
 
     return 0;
+#endif
 }
 
 

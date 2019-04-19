@@ -85,11 +85,12 @@ public:
 class MachineScheduler 
 {
 public:
-	MachineScheduler(std::string);
 	~MachineScheduler();
 	static MachineScheduler& GetInstance(std::string xmlFile);
 
 private:
+	MachineScheduler(std::string);
+	
 	void FlashLineMachineList();
 
 	Director *m_plcDirector;

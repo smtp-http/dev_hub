@@ -5,7 +5,7 @@ CXXFLAGS := -Wall -g -std=c++11 -pthread -I../vendor/libfins/include -I../vendor
 
 TARGET = libconn.a
 
-OBJS += connbaseimp.o eventlooperimp.o TcpServer.o UnixSockServer.o CommServer.o session.o Http.o
+OBJS += connbaseimp.o eventlooperimp.o TcpServer.o UnixSockServer.o CommServer.o session.o Http.o TcpClient.o
 all : $(TARGET)
 
 $(TARGET): $(OBJS)

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "machine.h"
 #include "station.h"
+#include "config.h"
 
 
 using namespace std;
@@ -23,6 +24,7 @@ Machine::~Machine()
 
 PlcMachine::PlcMachine()
 {
+	
 	ev_reciver& er = ev_reciver::GetInstance();
 	this->SetEvUpdater(&er);
 }
@@ -96,6 +98,11 @@ void Director::ConstructMachine(LineMachine_t* lineMachine)
 MachineScheduler::MachineScheduler(string xmlFile)
 {
 	m_plcDirector = new PlcDirector(new MachinePlcBuilder());
+	SysConfig& config = SysConfig::Instance();
+
+	config.GetUperComputerIp();
+	config.GetUperComputerPort();
+
 	this->FlashLineMachineList();
 }
 

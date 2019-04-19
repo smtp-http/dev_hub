@@ -1,6 +1,7 @@
 
 #include "TcpClient.h"
 
+using namespace std;
 
 bool TcpClient::Connect()
 {

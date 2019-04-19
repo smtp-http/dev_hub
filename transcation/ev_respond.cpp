@@ -22,7 +22,30 @@ ev_reciver& ev_reciver::GetInstance()
 	return _instance;
 }
 
-void ev_reciver::UpdateEvent(std::string sectionName,std::string machineName,std::string eventName)
+void ev_reciver::UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,char* eventData)
 {
 
+}
+
+//////////////////////////////////////// event ///////////////////////////////
+
+void Event::OnPlcEvent(char* data)
+{
+	m_evUpdater->UpdateEvent(m_sectionName,m_machineName,m_eventName,data);
+}
+
+
+
+//======================  Ev_register ======================
+
+
+// void Ev_Register::OnPlcEvent(char *data)
+// {
+// 	m_evUpdater->UpdateEvent(m_sectionName,m_machineName,m_eventName,data);
+// }
+
+
+void Ev_Register::SendEapData(char *data)
+{
+	
 }

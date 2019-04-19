@@ -8,13 +8,13 @@
 #include "connbase.h"
 #include "eventlooper.h"
 
-using namespace std;
+//using namespace std;
 using namespace lux;
 
 class TcpClient : public IConnectorAcceptorSink, public IConnectionSink, public ITimerUserSink
 {
 public:
-	TcpClient(const string &peerAddr, short peerPort)
+	TcpClient(std::string peerAddr, short peerPort)
 		: m_peerAddr(peerAddr)
 		, m_peerPort(peerPort)
 		, m_connector(NULL)
@@ -23,19 +23,20 @@ public:
 		, m_timerTest(-1)
 	{
 	}
+	~TcpClient(){}
 
 	bool Connect();
 protected:
-	virtual void OnConnection(Connection *conn, IConnectorAcceptor *ca);
+	void OnConnection(Connection *conn, IConnectorAcceptor *ca);
 
-	virtual void OnData(const char *buf, int length, Connection *conn);
+	void OnData(const char *buf, int length, Connection *conn);
 
-	virtual void OnWrite(Connection *conn);
-	virtual void OnDisconnect(int reason, Connection *conn);
+	void OnWrite(Connection *conn);
+	void OnDisconnect(int reason, Connection *conn);
 
-	virtual void OnTimer(TimerID tid);
+	void OnTimer(TimerID tid);
 private:
-	string m_peerAddr;
+	std::string m_peerAddr;
 	short m_peerPort;
 	Connector *m_connector;
 	Connection *m_connection;
