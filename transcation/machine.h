@@ -5,6 +5,7 @@
 #include <string>
 #include "station.h"
 #include "ev_respond.h"
+#include "PlcProxy.h"
 
 
 class Machine 
@@ -15,12 +16,17 @@ public:
 
 	std::string GetName(){return m_name;}
 	void SetName(std::string name){m_name = name;}
+
+	void EventPolling();
+
 protected:
-	std::map<std::string,StationEventProfile_t*> m_mainEvents;
-	std::map<std::string,StationEventProfile_t*> m_stationsEvents;
+	std::map<std::string,Event*> m_mainEvents;
+	std::map<std::string,Event*> m_stationsEvents;
 	std::map<std::string,LineStation_t*> m_stations;
 
 	void SetEvUpdater(IEventUpdater* eu){m_evUpdater = eu;}
+
+	Protocol *m_protocol;
 	
 private:
 	std::string m_name;
@@ -39,6 +45,7 @@ public:
 class Builder
 {
 public:
+	virtual void BuildMachine() = 0;
 	virtual void BuildMainDeviceProfile(MainDeviceProfile_t *) = 0;
 	virtual void BuildMainEvents(vector<StationEventProfile_t*>*) = 0;
 	virtual Machine* GetMachine()=0;
@@ -53,11 +60,13 @@ public:
 	MachinePlcBuilder(){m_machine=NULL;}
 	~MachinePlcBuilder();
 
+	virtual void BuildMachine();
 	virtual void BuildMainDeviceProfile(MainDeviceProfile_t *);
 	virtual void BuildMainEvents(vector<StationEventProfile_t*>*);
 
 	virtual Machine* GetMachine(){return m_machine;}
 	virtual void SetMachine(Machine *m){m_machine = m;}
+
 };
 
 
@@ -67,7 +76,9 @@ public:
 	Director();
 	~Director();
 
-	void ConstructMachine(LineMachine_t*);
+	void ConstructMachine(std::string,LineMachine_t*);
+
+	void MachinesPolling();
 protected:
 	Builder  *m_builder;
 	std::map<std::string,Machine*> m_machines;
@@ -90,7 +101,7 @@ public:
 
 private:
 	MachineScheduler(std::string);
-	
+
 	void FlashLineMachineList();
 
 	Director *m_plcDirector;

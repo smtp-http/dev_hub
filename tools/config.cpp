@@ -61,6 +61,10 @@ int SysConfig::LoadConfig()
 			if (user != NULL)
 				user->Update(root);
 		}
+
+		uperComputerIp = root["UperComputerIp"].asString();
+		uperComputerPort = root["UperComputerPort"].asInt();
+		
 #if 0
 	//读取根节点信息
 		string name = root["name"].asString();

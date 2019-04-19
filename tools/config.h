@@ -20,9 +20,17 @@ public:
 	virtual void AddUser(IConfigUser *u);
 	virtual void DelUser(IConfigUser *u);
 	static SysConfig& Instance();
+
+	std::string GetUperComputerIp(){return uperComputerIp;}
+	short GetUperComputerPort(){return uperComputerPort;}
+	std::string GetPlcProtocol(){return plcProtocol;}
 private:
 	SysConfig(){}
 	std::list<IConfigUser *> m_users;
+
+	std::string uperComputerIp;
+	short uperComputerPort;
+	std::string plcProtocol;
 };
 
 

@@ -1,9 +1,8 @@
 #include "PlcProxy.h"
 
+using namespace std;
 
-PlcProxy::PlcProxy(Protocol* p,PlcContex* pc)
-	: m_protocol(p)
-	, m_plcContex(pc)
+PlcProxy::PlcProxy()
 {
 
 }
@@ -11,13 +10,13 @@ PlcProxy::PlcProxy(Protocol* p,PlcContex* pc)
 
 PlcProxy::~PlcProxy()
 {
-	
+
 }
 
 
 int PlcProxy::PlcConnect()
 {
-	
+
 }
 
 
@@ -27,7 +26,7 @@ void PlcProxy::PlcWriteWorlds(char* data,unsigned int long)
 }
 
 
-unsigned int PlcProxy::PlcReadWorlds(char* recvBuf)
+unsigned int PlcProxy::PlcReadWorlds(std::string plcAddr,char* recvBuf)
 {
 
 }

@@ -1,6 +1,7 @@
 #ifndef __PLC_PROXY_H__
 #define __PLC_PROXY_H__
 
+#include <string>
 ////////////////////////// Protocol /////////////////////////
 class Protocol
 {
@@ -14,30 +15,36 @@ class FinsProtocol : public Protocol
 
 /////////////////////////// PclContex /////////////////////////
 
-
-class PlcContex
+class MachineContex
 {
+public:
+
+protected:
+	std::string protocol;
+};
+
+
+class PlcContex : public MachineContex
+{
+public:
+	PlcContex(){}
+	~PlcContex(){}
 
 };
 
-class PlcContexFins : public PlcContex
-{
-
-};
 
 //////////////////////////// PlcProxy //////////////////////////
 class PlcProxy
 {
 public:
-	PlcProxy(Protocol* ,PlcContex* );
+	PlcProxy();
 	~PlcProxy();
 	int PlcConnect();
 	void PlcWriteWorlds(char* data,unsigned int long);
-	unsigned int PlcReadWorlds(char* recvBuf);
+	unsigned int PlcReadWorlds(std::string plcAddr,char* recvBuf);
 
 private:
-	Protocol* m_protocol;
-	PlcContex* m_plcContex;
+	
 };
 
 

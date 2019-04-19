@@ -19,6 +19,19 @@ Machine::~Machine()
 
 }
 
+void Machine::EventPolling()
+{
+	map<string,Event*>::iterator it; 
+
+    for(it=m_mainEvents.begin();it!=m_mainEvents.end();++it) {
+    	it->second->SniffingPlcEvent();
+    }
+
+    for(it=m_stationsEvents.begin();it!=m_stationsEvents.end();++it) {
+    	it->second->SniffingPlcEvent();
+    }
+}
+
 
 //=================================
 
@@ -27,6 +40,8 @@ PlcMachine::PlcMachine()
 	
 	ev_reciver& er = ev_reciver::GetInstance();
 	this->SetEvUpdater(&er);
+
+	
 }
 
 PlcMachine::~PlcMachine()
@@ -37,12 +52,31 @@ PlcMachine::~PlcMachine()
 ////////////////////////////////////////////////////  Builder //////////////////////////////////////////////////////////////
 
 
+Protocol* GetProtocol(string name)
+{
+	static FinsProtocol fp;
+
+	if(name == "Fins") {
+		return &fp;
+	} else {
+		return NULL;
+	}
+}
+
 //==============================
+
+void MachinePlcBuilder::BuildMachine()
+{
+
+	m_machine = new PlcMachine;
+}
 
 void MachinePlcBuilder::BuildMainDeviceProfile(MainDeviceProfile_t *mainDevPro)
 {
 	if (m_machine == NULL){
-		m_machine = new PlcMachine;
+
+		//m_machine = new PlcMachine;
+		return;
 	}
 
 	//m_machine
@@ -51,7 +85,7 @@ void MachinePlcBuilder::BuildMainDeviceProfile(MainDeviceProfile_t *mainDevPro)
 void MachinePlcBuilder::BuildMainEvents(vector<StationEventProfile_t*>* mainEvList)
 {
 	if (m_machine == NULL){
-		m_machine = new PlcMachine;
+		//m_machine = new PlcMachine;
 	}
 
 	
@@ -69,7 +103,7 @@ Director::~Director()
 	
 }
 
-void Director::ConstructMachine(LineMachine_t* lineMachine)
+void Director::ConstructMachine(string sectionName,LineMachine_t* lineMachine)
 {
 	if (lineMachine == NULL) {
 		printf("line machine NULL!\n");
@@ -85,10 +119,19 @@ void Director::ConstructMachine(LineMachine_t* lineMachine)
 		return;
 	}
 	
-	m_machines[mc->GetName()] = mc;
+	m_machines[sectionName + mc->GetName()] = mc;
 	m_builder->SetMachine(NULL);
 }
 
+
+void Director::MachinesPolling()
+{
+	map<string,Machine*>::iterator it;   
+    for(it=m_machines.begin();it!=m_machines.end();++it) {
+        //cout<<"key: "<<it->first <<" value: "<<it->second<<endl; 
+        it->second->EventPolling();
+    }
+}
 
 
 
@@ -119,6 +162,7 @@ MachineScheduler& MachineScheduler::GetInstance(string xmlFile)
 }
 
 
+
 //void ShowVec(const vector<StationEventProfile_t*>& valList);
 LineStationDesiginProfile_t* GetLineStationDesiginProfile(std::string xmlFile);
 
@@ -132,7 +176,7 @@ void MachineScheduler::FlashLineMachineList()
 		if(lm_list!=NULL){
 			for (vector<LineMachine_t*>::const_iterator iter = lm_list->begin(); iter != lm_list->end(); iter++){
 				LineMachine_t* lineMachine = *iter;
-				m_plcDirector->ConstructMachine(lineMachine);
+				m_plcDirector->ConstructMachine((*iter_sec)->Name,lineMachine);
 			}
 		}
 	}

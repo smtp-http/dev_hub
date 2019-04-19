@@ -2,13 +2,16 @@
 #define __EV_RESPOND_H__
 
 #include <string>
+#include <string.h>
 #include "TcpClient.h"
+#include "PlcProxy.h"
 
 #define EV_PARAM std::string sectionName, \
 		std::string machineName, \
 		std::string eventName, \
 		std::string plcEventAddr,unsigned int plcDataSize, \
-		std::string eapEventAddr,unsigned int eapDataSize
+		std::string eapEventAddr,unsigned int eapDataSize, \
+		std::string flag
 
 #define EV_PARAM_INIT m_sectionName = sectionName; \
 		m_machineName = machineName; \
@@ -16,12 +19,13 @@
 		m_plcEventAddr = plcEventAddr; \
 		m_plcDataSize = plcDataSize; \
 		m_eapEventAddr = eapEventAddr; \
-		m_eapDataSize = eapDataSize;
+		m_eapDataSize = eapDataSize; \
+		m_flag = flag;
 
 class IEventUpdater
 {
 public:
-	virtual void UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,char* data) = 0;
+	virtual void UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,char* data,unsigned int len) = 0;
 };
 
 class ev_reciver : public IEventUpdater
@@ -30,7 +34,7 @@ public:
 	~ev_reciver();
 
 	static ev_reciver& GetInstance();
-	virtual void UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,char* data);
+	virtual void UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,char* data,unsigned int len);
 
 private:
 	ev_reciver();
@@ -38,22 +42,25 @@ private:
 	TcpClient* m_client;
 };
 
+#define EV_DATA_BUFF_LEN 50
 
 class Event {
 public:
 	Event()
 		: m_evUpdater(&ev_reciver::GetInstance())
-	{}
+	{memset(m_lastData,0,EV_DATA_BUFF_LEN);}
 
 	~Event(){}
 
-	void OnPlcEvent(char* data);
+	void SniffingPlcEvent();
 	virtual void SendEapData(char* data) = 0;
 
 protected:
 	std::string m_sectionName;
 	std::string m_machineName;
 	std::string m_eventName;
+
+	std::string m_flag;     // "DM"
 
 	std::string m_plcEventAddr;
 	unsigned int m_plcDataSize;    // word
@@ -62,6 +69,10 @@ protected:
 	unsigned int m_eapDataSize;
 
 	IEventUpdater *m_evUpdater;
+
+	PlcProxy *m_plcProxy;
+
+	char m_lastData[EV_DATA_BUFF_LEN];
 };
 
 
