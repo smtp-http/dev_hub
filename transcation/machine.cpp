@@ -32,6 +32,23 @@ void Machine::EventPolling()
     }
 }
 
+Event* Machine::GetEvent(string evName)
+{
+	map<string,Event*>::iterator it; 
+
+    for(it=m_mainEvents.begin();it!=m_mainEvents.end();++it) {
+    	if(it->first == evName) {
+    		return it->second;
+    	}
+    }
+
+    for(it=m_stationsEvents.begin();it!=m_stationsEvents.end();++it) {
+    	if(it->first == evName) {
+    		return it->second;
+    	}
+    }
+}
+
 
 //=================================
 
@@ -133,6 +150,16 @@ void Director::MachinesPolling()
     }
 }
 
+
+int Director::WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,char *data,unsigned int len)
+{
+	Machine *m = m_machines[sectionName + machineName];
+	if(m == NULL) {
+		return NO_SECTIONNAME_OR_MACINENAME;
+	}
+
+	Event *ev = m->GetEvent(eventName);
+} 
 
 
 ///////////////////////////////////////////////////  MachineScheduler /////////////////////////////////////////////////////

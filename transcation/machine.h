@@ -8,6 +8,12 @@
 #include "PlcProxy.h"
 
 
+#define OK 0
+#define NO_SECTIONNAME_OR_MACINENAME -1
+
+
+///////////////////////////////// Machine /////////////////////////////////////////
+
 class Machine 
 {
 public:
@@ -18,6 +24,8 @@ public:
 	void SetName(std::string name){m_name = name;}
 
 	void EventPolling();
+
+	Event* GetEvent(std::string evName);
 
 protected:
 	std::map<std::string,Event*> m_mainEvents;
@@ -79,9 +87,12 @@ public:
 	void ConstructMachine(std::string,LineMachine_t*);
 
 	void MachinesPolling();
+
+	int WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,char *data,unsigned int len);
+
 protected:
 	Builder  *m_builder;
-	std::map<std::string,Machine*> m_machines;
+	std::map<std::string,Machine*> m_machines;    // key = sectionName + machineName
 };
 
 class PlcDirector : public Director
