@@ -18,7 +18,7 @@ class Machine
 {
 public:
 	Machine();
-	~Machine();
+	virtual ~Machine();
 
 	std::string GetName(){return m_name;}
 	void SetName(std::string name){m_name = name;}
@@ -46,7 +46,7 @@ class PlcMachine : public Machine
 {
 public:
 	PlcMachine();
-	~PlcMachine();
+	virtual ~PlcMachine();
 };
 
 
@@ -82,13 +82,13 @@ class Director
 {
 public:
 	Director();
-	~Director();
+	virtual ~Director();
 
 	void ConstructMachine(std::string,LineMachine_t*);
 
 	void MachinesPolling();
 
-	int WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,char *data,unsigned int len);
+	int WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,char *data);
 
 protected:
 	Builder  *m_builder;
@@ -99,7 +99,7 @@ class PlcDirector : public Director
 {
 public:
 	PlcDirector(Builder *b){m_builder = b;}
-	~PlcDirector();
+	virtual ~PlcDirector(){}
 };
 
 

@@ -33,7 +33,15 @@ void Event::SniffingPlcEvent()
 {
 	char rd_buf[EV_DATA_BUFF_LEN];
 	string addr = m_flag + m_plcEventAddr;
-	unsigned int len = m_plcProxy->PlcReadWorlds(addr,rd_buf);
+
+	PlcProxy* plcProxy = &PlcProxy::Instance();
+	
+	if (m_machineContex == NULL) {
+		printf("m_machineContex is NULL!  return.\n" );
+		return;
+	}
+
+	unsigned int len = plcProxy->PlcReadWorlds(m_machineContex,addr,rd_buf);
 	for(int i = 0;i < m_plcDataSize;i ++) {
 		if(m_lastData[i] != rd_buf[i]) 
 			m_evUpdater->UpdateEvent(m_sectionName,m_machineName,m_eventName,rd_buf,m_plcDataSize);
@@ -45,11 +53,6 @@ void Event::SniffingPlcEvent()
 
 //======================  Ev_register ======================
 
-
-// void Ev_Register::OnPlcEvent(char *data)
-// {
-// 	m_evUpdater->UpdateEvent(m_sectionName,m_machineName,m_eventName,data);
-// }
 
 
 void Ev_Register::SendEapData(char *data)

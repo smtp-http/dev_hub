@@ -31,7 +31,7 @@ public:
 class ev_reciver : public IEventUpdater
 {
 public:
-	~ev_reciver();
+	virtual ~ev_reciver();
 
 	static ev_reciver& GetInstance();
 	virtual void UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,char* data,unsigned int len);
@@ -48,12 +48,20 @@ class Event {
 public:
 	Event()
 		: m_evUpdater(&ev_reciver::GetInstance())
-	{memset(m_lastData,0,EV_DATA_BUFF_LEN);}
+		, m_machineContex(NULL)
+	{
+		memset(m_lastData,0,EV_DATA_BUFF_LEN);
+	}
 
-	~Event(){}
+	virtual ~Event(){}
 
 	void SniffingPlcEvent();
 	virtual void SendEapData(char* data) = 0;
+
+	void SetMachineContex(MachineContex* mc)
+	{
+		m_machineContex = mc;
+	}
 
 protected:
 	std::string m_sectionName;
@@ -70,7 +78,7 @@ protected:
 
 	IEventUpdater *m_evUpdater;
 
-	PlcProxy *m_plcProxy;
+	MachineContex *m_machineContex;
 
 	char m_lastData[EV_DATA_BUFF_LEN];
 };
@@ -84,9 +92,8 @@ public:
 		EV_PARAM_INIT
 	}
 
-	~Ev_Register(){}
+	virtual ~Ev_Register(){}
 
-	//virtual void OnPlcEvent(char* data);
 	virtual void SendEapData(char* data);
 };
 

@@ -69,16 +69,6 @@ PlcMachine::~PlcMachine()
 ////////////////////////////////////////////////////  Builder //////////////////////////////////////////////////////////////
 
 
-Protocol* GetProtocol(string name)
-{
-	static FinsProtocol fp;
-
-	if(name == "Fins") {
-		return &fp;
-	} else {
-		return NULL;
-	}
-}
 
 //==============================
 
@@ -151,7 +141,7 @@ void Director::MachinesPolling()
 }
 
 
-int Director::WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,char *data,unsigned int len)
+int Director::WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,char *data)
 {
 	Machine *m = m_machines[sectionName + machineName];
 	if(m == NULL) {
@@ -159,6 +149,8 @@ int Director::WriteMachineData(std::string sectionName,std::string machineName,s
 	}
 
 	Event *ev = m->GetEvent(eventName);
+
+	ev->SendEapData(data);
 } 
 
 
