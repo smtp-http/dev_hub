@@ -8,9 +8,10 @@
 #include "connbase.h"
 #include "eventlooper.h"
 
-//using namespace std;
+using namespace std;
 using namespace lux;
 
+#if 0
 class TcpClient : public IConnectorAcceptorSink, public IConnectionSink, public ITimerUserSink
 {
 public:
@@ -25,16 +26,16 @@ public:
 	}
 	~TcpClient(){}
 
-	bool Connect();
+	virtual bool Connect();
 protected:
-	void OnConnection(Connection *conn, IConnectorAcceptor *ca);
+	virtual void OnConnection(Connection *conn, IConnectorAcceptor *ca);
 
-	void OnData(const char *buf, int length, Connection *conn);
+	virtual void OnData(const char *buf, int length, Connection *conn);
 
-	void OnWrite(Connection *conn);
-	void OnDisconnect(int reason, Connection *conn);
+	virtual void OnWrite(Connection *conn);
+	virtual void OnDisconnect(int reason, Connection *conn);
 
-	void OnTimer(TimerID tid);
+	virtual void OnTimer(TimerID tid);
 private:
 	std::string m_peerAddr;
 	short m_peerPort;
@@ -43,6 +44,109 @@ private:
 	TimerID m_timerReconn;
 	TimerID m_timerTest;
 };
+
+#else
+class TcpClient : public IConnectorAcceptorSink, public IConnectionSink, public ITimerUserSink
+{
+	string m_peerAddr;
+	short m_peerPort;
+	Connector *m_connector;
+	Connection *m_connection;
+	TimerID m_timerReconn;
+	TimerID m_timerTest;
+
+public:
+	TcpClient(const string &peerAddr, short peerPort)
+		: m_peerAddr(peerAddr)
+		, m_peerPort(peerPort)
+		, m_connector(NULL)
+		, m_connection(NULL)
+		, m_timerReconn(-1)
+		, m_timerTest(-1)
+	{
+	}
+
+	bool Connect(){
+		if (m_connector)
+			return true;
+		m_connector = new Connector(m_peerAddr, m_peerPort, this);
+		return m_connector->Connect(3000) == 0; //3 seconds
+	}
+protected:
+	virtual void OnConnection(Connection *conn, IConnectorAcceptor *ca){
+		if (conn){
+			//cout << "Client: connected succeed to " << conn->GetPeerAddress() << ":" << conn->GetPeerPort() << endl;
+			m_connection = conn;
+
+			string msg("hello, libevent!");
+			conn->SetConnectionSink(this);
+			//conn->Send(msg.c_str(), msg.length());
+			struct timeval tv={0, 500*1000};
+			m_timerTest = EventLooper::GetInstance().ScheduleTimer(&tv, TF_FIRE_PERIODICALLY, this);
+
+			if (m_timerReconn != -1){
+				EventLooper::GetInstance().CancelTimer(m_timerReconn);
+				m_timerReconn = -1;
+			}
+		} else {
+			cout << "Client: connect to " << m_peerAddr << ":" << m_peerPort << " failed." << endl;
+		}
+		delete m_connector;
+		m_connector = NULL;
+
+		if (!conn){
+			cout << "not connected, try again!" << endl;
+			//Connect();
+			if (m_timerReconn == -1){
+				struct timeval tv={1, 0};
+				m_timerReconn = EventLooper::GetInstance().ScheduleTimer(&tv, TF_FIRE_PERIODICALLY, this);
+			}
+		}
+	}
+
+	virtual void OnData(const char *buf, int length, Connection *conn){
+		cout << "OnData" << endl;
+		string s(buf, length);
+		cout << "recv: " << s << endl;
+		//conn->Send(buf, length);
+		//EventLooper::GetInstance().StopEventLoop(3000);
+	}
+
+	virtual void OnWrite(Connection *conn){
+		cout << "OnWrite" << endl;
+	}
+
+	virtual void OnDisconnect(int reason, Connection *conn)
+	{
+		//cout << "OnDisconnect from " << conn->GetPeerAddress() << ":" << conn->GetPeerPort() << endl;
+		delete m_connection;
+		m_connection = NULL;
+
+		EventLooper &el = EventLooper::GetInstance();
+		if (m_timerTest != -1){
+			el.CancelTimer(m_timerTest);
+			m_timerTest = -1;
+		}
+
+		el.StopEventLoop(100);
+	}
+
+	virtual void OnTimer(TimerID tid)
+	{
+		//cout << "OnTimer " << tid << endl;
+		if (tid == m_timerTest){
+			if (m_connection){
+				string msg("Time data");
+				m_connection->Send(msg.data(), msg.length());
+			}
+		} else if(tid == m_timerReconn){
+			cout << "start to reconnecting ... " << endl;
+			Connect();
+		}
+	}
+};
+
+#endif
 
 
 

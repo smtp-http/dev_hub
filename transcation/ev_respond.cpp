@@ -1,13 +1,16 @@
 
 #include "ev_respond.h"
+#include "config.h"
 
 using namespace std;
+
 
 ///////////////////////////////// ev_reciver ////////////////////////////
 
 ev_reciver::ev_reciver()
-	: m_client(NULL)
+	: m_client(new TcpClient(SysConfig::Instance().GetUperComputerIp(),(short)SysConfig::Instance().GetUperComputerPort()))
 {
+	//m_client = new TcpClient(SysConfig::Instance().GetUperComputerIp(),(short)SysConfig::Instance().GetUperComputerPort());
 	return;
 }
 

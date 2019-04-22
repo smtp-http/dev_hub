@@ -160,10 +160,10 @@ int Director::WriteMachineData(std::string sectionName,std::string machineName,s
 MachineScheduler::MachineScheduler(string xmlFile)
 {
 	m_plcDirector = new PlcDirector(new MachinePlcBuilder());
-	SysConfig& config = SysConfig::Instance();
+	//SysConfig& config = SysConfig::Instance();
 
-	config.GetUperComputerIp();
-	config.GetUperComputerPort();
+	//config.GetUperComputerIp();
+	//config.GetUperComputerPort();
 
 	this->FlashLineMachineList();
 }

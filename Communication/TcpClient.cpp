@@ -3,6 +3,8 @@
 
 using namespace std;
 
+
+#if 0
 bool TcpClient::Connect()
 {
 	if (m_connector)
@@ -85,3 +87,4 @@ void TcpClient::OnTimer(TimerID tid)
 		Connect();
 	}
 }
+#endif
