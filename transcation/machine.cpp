@@ -50,6 +50,16 @@ Event* Machine::GetEvent(string evName)
 }
 
 
+void Machine::PushMainEvent(string name,Event* ev)
+{
+	m_mainEvents[name,ev];
+}
+
+void Machine::PushStationsEvent(string name,Event* ev)
+{
+	m_stationsEvents[name,ev];
+}
+
 //=================================
 
 PlcMachine::PlcMachine()
@@ -81,23 +91,47 @@ void MachinePlcBuilder::BuildMachine()
 void MachinePlcBuilder::BuildMainDeviceProfile(MainDeviceProfile_t *mainDevPro)
 {
 	if (m_machine == NULL){
-
-		//m_machine = new PlcMachine;
+		printf("%s:%d  m_machine is null!\n",__FILE__,__LINE__);
 		return;
 	}
 
 	//m_machine
 }
 
+
+#define PARA_INPUT(sep)  sep->Name,sep->Action,sep->PlcBlockAddress,sep->PlcBlockSize, \
+						sep->EapBlockAddress,sep->EapBlockSize,sep->Flag
+
+
 void MachinePlcBuilder::BuildMainEvents(vector<StationEventProfile_t*>* mainEvList)
 {
 	if (m_machine == NULL){
-		//m_machine = new PlcMachine;
+		printf("%s:%d  m_machine is null!\n",__FILE__,__LINE__);
+		return;
 	}
 
-	
-}
+	for (vector<StationEventProfile_t*>::const_iterator iter = mainEvList->begin();iter != mainEvList->end();iter++) {
+		StationEventProfile_t* sep = *iter;
 
+		Event* ev = NULL;
+
+		if (sep->Action == "Register") {
+			ev = new Ev_Register(sep->Name,sep->Action,sep->PlcBlockAddress,sep->PlcBlockSize, \
+						sep->EapBlockAddress,sep->EapBlockSize,sep->Flag);
+		} else if (sep->Action == "Register") {
+			ev = new Ev_EapCommand(PARA_INPUT(sep));
+		} else {
+			printf("%s:%d  Action is not exist!\n",__FILE__,__LINE__);
+			return;
+		}
+
+		m_machine->
+	}
+}
+/* std::string eventName,  std::string eventAction \
+		std::string plcEventAddr,unsigned int plcDataSize, \
+		std::string eapEventAddr,unsigned int eapDataSize, \
+		std::string flag */
 //////////////////////////////////////////////////// Director //////////////////////////////////////////////////////////////
 
 Director::Director()
@@ -116,6 +150,8 @@ void Director::ConstructMachine(string sectionName,LineMachine_t* lineMachine)
 		printf("line machine NULL!\n");
 		return;
 	}
+
+	m_builder->BuildMachine();
 	
 	m_builder->BuildMainEvents(lineMachine->p_mainEvents);
 	m_builder->BuildMainDeviceProfile(&lineMachine->mainDeviceProfile);
@@ -160,10 +196,6 @@ int Director::WriteMachineData(std::string sectionName,std::string machineName,s
 MachineScheduler::MachineScheduler(string xmlFile)
 {
 	m_plcDirector = new PlcDirector(new MachinePlcBuilder());
-	//SysConfig& config = SysConfig::Instance();
-
-	//config.GetUperComputerIp();
-	//config.GetUperComputerPort();
 
 	this->FlashLineMachineList();
 }

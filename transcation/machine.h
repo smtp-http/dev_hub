@@ -27,6 +27,14 @@ public:
 
 	Event* GetEvent(std::string evName);
 
+	void PushMainEvent(std::string,Event*);
+	void PushStationsEvent(std::string,Event*);
+
+	void PushLineStation(std::string name,LineStation_t* ls)
+	{
+		m_stations[name,ls];
+	}
+
 protected:
 	std::map<std::string,Event*> m_mainEvents;
 	std::map<std::string,Event*> m_stationsEvents;

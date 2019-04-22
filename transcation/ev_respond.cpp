@@ -10,7 +10,7 @@ using namespace std;
 ev_reciver::ev_reciver()
 	: m_client(new TcpClient(SysConfig::Instance().GetUperComputerIp(),(short)SysConfig::Instance().GetUperComputerPort()))
 {
-	//m_client = new TcpClient(SysConfig::Instance().GetUperComputerIp(),(short)SysConfig::Instance().GetUperComputerPort());
+	m_client->Connect();
 	return;
 }
 
@@ -62,3 +62,13 @@ void Ev_Register::SendEapData(char *data)
 {
 
 }
+
+//======================  Ev_EapCommand ======================
+
+
+
+void Ev_EapCommand::SendEapData(char *data)
+{
+
+}
+

@@ -6,15 +6,12 @@
 #include "TcpClient.h"
 #include "PlcProxy.h"
 
-#define EV_PARAM std::string sectionName, \
-		std::string machineName, \
-		std::string eventName, \
-		std::string plcEventAddr,unsigned int plcDataSize, \
-		std::string eapEventAddr,unsigned int eapDataSize, \
-		std::string flag
+#define EV_PARAM std::string &eventName,  std::string &eventAction \
+		int &plcEventAddr,unsigned int &plcDataSize, \
+		int &eapEventAddr,unsigned int &eapDataSize, \
+		std::string &flag
 
-#define EV_PARAM_INIT m_sectionName = sectionName; \
-		m_machineName = machineName; \
+#define EV_PARAM_INIT m_eventAction = eventAction; \
 		m_eventName = eventName; \
 		m_plcEventAddr = plcEventAddr; \
 		m_plcDataSize = plcDataSize; \
@@ -64,16 +61,16 @@ public:
 	}
 
 protected:
-	std::string m_sectionName;
-	std::string m_machineName;
+
 	std::string m_eventName;
+	std::string m_eventAction;
 
 	std::string m_flag;     // "DM"
 
-	std::string m_plcEventAddr;
+	int m_plcEventAddr;
 	unsigned int m_plcDataSize;    // word
 
-	std::string m_eapEventAddr;      // 
+	int m_eapEventAddr;      // 
 	unsigned int m_eapDataSize;
 
 	IEventUpdater *m_evUpdater;
@@ -87,13 +84,26 @@ protected:
 class Ev_Register : public Event
 {
 public:
-	Ev_Register(EV_PARAM)
+	Ev_Register()
 	{
 		EV_PARAM_INIT
 	}
 
+	Ev_Register(EV_PARAM);
 	virtual ~Ev_Register(){}
 
+	virtual void SendEapData(char* data);
+};
+
+
+class Ev_EapCommand : public Event
+{
+public:
+	Ev_EapCommand(EV_PARAM)
+	{
+		EV_PARAM_INIT
+	}
+	virtual ~Ev_EapCommand(){}
 	virtual void SendEapData(char* data);
 };
 
