@@ -2,6 +2,12 @@
 #define __PLC_PROXY_H__
 
 #include <string>
+#include "eventlooper.h"
+
+#define CONNECT_OK  0
+#define CONNECT_NO  1
+
+using namespace lux;
 
 class PlcProxy;
 /////////////////////////// PclContex /////////////////////////
@@ -12,18 +18,17 @@ public:
 	MachineContex(){}
 	virtual ~MachineContex(){}
 
-	void SetConnectionContex(void *contex){m_connectionContex = contex;}  // for example: struct fins_sys_tp *m_sys;
+	//void SetConnectionContex(void *contex){m_connectionContex = contex;}  // for example: struct fins_sys_tp *m_sys;
 	std::string SectionName(){return m_sectionName;}
 	std::string MachineName(){return m_machineName;}
 
 	PlcProxy* GetProxy(){return m_proxy;}
 
-protected:
-	void* m_connectionContex;
 
 	std::string m_ip;
 	unsigned int m_port;
 
+protected:
 	PlcProxy* m_proxy;
 	std::string m_protocolType;
 
@@ -45,7 +50,7 @@ private:
 
 
 //////////////////////////// PlcProxy //////////////////////////
-class PlcProxy
+class PlcProxy : public ITimerUserSink
 {
 public:
 	PlcProxy();
@@ -56,9 +61,15 @@ public:
 	virtual void PlcWriteWorlds(MachineContex*,char* data,unsigned int) = 0;
 	virtual unsigned int PlcReadWorlds(MachineContex*,std::string plcAddr,char* recvBuf) = 0;
 
-private:
+protected:
+	virtual void OnTimer(TimerID tid){}
+
+	TimerID m_reconnect;
+
 	int m_connectionStatus;
-	
+	void* m_plcConnectHandle;
+
+	MachineContex* m_contex;
 };
 
 class FinsPlcProxy : public PlcProxy
@@ -71,6 +82,8 @@ public:
 	virtual int PlcConnect(MachineContex*);
 	virtual void PlcWriteWorlds(MachineContex*,char* data,unsigned int);
 	virtual unsigned int PlcReadWorlds(MachineContex*,std::string plcAddr,char* recvBuf);
+
+	virtual void OnTimer(TimerID tid);
 };
 
 

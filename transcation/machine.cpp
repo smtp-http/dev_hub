@@ -31,12 +31,13 @@ Event* BuildEvent(string action,struct EvPara* ev_para)
 //////////////////////////////////////////////////////// Machine //////////////////////////////////////////////////////////
 Machine::Machine()
 {
-
+	struct timeval tv2={0, 200};
+	m_valuePolling = EventLooper::GetInstance().ScheduleTimer(&tv2, TF_FIRE_PERIODICALLY, this);
 }
 
 Machine::~Machine()
 {
-
+	EventLooper::GetInstance().CancelTimer(m_valuePolling);
 }
 
 void Machine::EventPolling()
@@ -82,6 +83,15 @@ void Machine::PushStationsEvent(string name,Event* ev)
 	//m_stationsEvents[name] = ev;
 	if (!m_stationsEvents.count(name))
 		m_stationsEvents.insert (make_pair (name,ev));
+}
+
+void Machine::OnTimer(TimerID tid)
+{
+	// TODO: event polling
+	cout << "machine OnTimer " << tid << endl;
+	if (tid == m_valuePolling) {
+		cout << "event pollint" << endl;
+	}
 }
 
 //=================================

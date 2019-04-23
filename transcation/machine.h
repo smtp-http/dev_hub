@@ -6,18 +6,17 @@
 #include "station.h"
 #include "ev_respond.h"
 #include "PlcProxy.h"
+#include "eventlooper.h"
 
+using namespace lux;
 
 #define OK 0
 #define NO_SECTIONNAME_OR_MACINENAME -1
 
-#define CONNECTION_STATUS_BUSY 0
-#define CONNECTION_STATUS_IDEL 1
-
 
 ///////////////////////////////// Machine /////////////////////////////////////////
 
-class Machine 
+class Machine : public ITimerUserSink
 {
 public:
 	Machine();
@@ -43,6 +42,7 @@ public:
 	void SetMachineContex(MachineContex* mc){m_contex = mc;}
 	MachineContex* GetMachineContex(){return m_contex;}
 
+	virtual void OnTimer(TimerID tid);
 
 protected:
 	std::map<std::string,Event*> m_mainEvents;
@@ -53,6 +53,8 @@ protected:
 
 	PlcProxy* m_proxy;
 	MachineContex* m_contex;
+
+	TimerID m_valuePolling;
 	
 private:
 	std::string m_name;
