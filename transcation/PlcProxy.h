@@ -28,7 +28,7 @@ public:
 	void SetConnectionContex(void *contex){m_connectionContex = contex;}  // for example: struct fins_sys_tp *m_sys;
 	std::string SectionName(){return m_sectionName;}
 	std::string MachineName(){return m_machineName;}
-	
+
 protected:
 	void* m_connectionContex;
 
@@ -46,7 +46,7 @@ protected:
 class PlcContex : public MachineContex
 {
 public:
-	PlcContex(std::string ,std::string ,unsigned int);
+	PlcContex(std::string protoName,std::string sectionName,std::string machineName,std::string ip,unsigned int port);
 	virtual ~PlcContex(){}
 
 

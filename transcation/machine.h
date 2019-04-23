@@ -37,6 +37,9 @@ public:
 			m_stations.insert (make_pair (name,ls));
 	}
 
+	void SetMachineContex(MachineContex* mc){m_contex = mc;}
+	MachineContex* GetMachineContex(){return m_contex;}
+
 protected:
 	std::map<std::string,Event*> m_mainEvents;
 	std::map<std::string,Event*> m_stationsEvents;
@@ -44,7 +47,8 @@ protected:
 
 	void SetEvUpdater(IEventUpdater* eu){m_evUpdater = eu;}
 
-	Protocol *m_protocol;
+	//Protocol *m_protocol;
+	MachineContex* m_contex;
 	
 private:
 	std::string m_name;
@@ -63,9 +67,9 @@ public:
 class Builder
 {
 public:
-	virtual void BuildMachine() = 0;
+	virtual void BuildMachine(std::string sectionName,LineMachine_t*) = 0;
 	virtual void BuildMainDeviceProfile(MainDeviceProfile_t *) = 0;
-	virtual void BuildMainEvents(vector<StationEventProfile_t*>*) = 0;
+	virtual void BuildCustomEvents(vector<StationEventProfile_t*>*) = 0;
 	virtual Machine* GetMachine()=0;
 	virtual void SetMachine(Machine *) = 0;
 protected:
@@ -78,9 +82,9 @@ public:
 	MachinePlcBuilder(){m_machine=NULL;}
 	~MachinePlcBuilder();
 
-	virtual void BuildMachine();
+	virtual void BuildMachine(std::string sectionName,LineMachine_t*);
 	virtual void BuildMainDeviceProfile(MainDeviceProfile_t *);
-	virtual void BuildMainEvents(vector<StationEventProfile_t*>*);
+	virtual void BuildCustomEvents(vector<StationEventProfile_t*>*);
 
 	virtual Machine* GetMachine(){return m_machine;}
 	virtual void SetMachine(Machine *m){m_machine = m;}

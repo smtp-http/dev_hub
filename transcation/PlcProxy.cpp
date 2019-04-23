@@ -15,12 +15,15 @@ Protocol* GetProtocol(string name)
 }
 
 /////////////////////////////////////////////  PlcContex  //////////////////////////////////////////
-PlcContex::PlcContex(string protocolName,string ip,unsigned int port)
+PlcContex::PlcContex(std::string protoName,std::string sectionName,std::string machineName,std::string ip,unsigned int port)
 {
-	m_protocolType = protocolName;
+	m_protocolType = protoName;
 	m_ip = ip;
 	m_port = port;
-	m_protocol = GetProtocol(protocolName);
+	m_protocol = GetProtocol(protoName);
+
+	m_sectionName = sectionName;
+	m_machineName = machineName;
 }
 
 

@@ -8,6 +8,26 @@
 
 using namespace std;
 
+
+
+Event* BuildEvent(string action,struct EvPara* ev_para)
+{
+	Event* ev = NULL;
+
+	if (action == "Register") {
+		ev = new Ev_Register(ev_para);
+	} else if (action == "Register") {
+		ev = new Ev_EapCommand(ev_para);
+	} else {
+		printf("%s:%d  Action is not exist!\n",__FILE__,__LINE__);
+		return NULL;
+	}
+
+	return ev;
+}
+
+
+
 //////////////////////////////////////////////////////// Machine //////////////////////////////////////////////////////////
 Machine::Machine()
 {
@@ -60,8 +80,8 @@ void Machine::PushMainEvent(string name,Event* ev)
 void Machine::PushStationsEvent(string name,Event* ev)
 {
 	//m_stationsEvents[name] = ev;
-	if (!m_mainEvents.count(name))
-		m_mainEvents.insert (make_pair (name,ev));
+	if (!m_stationsEvents.count(name))
+		m_stationsEvents.insert (make_pair (name,ev));
 }
 
 //=================================
@@ -86,10 +106,14 @@ PlcMachine::~PlcMachine()
 
 //==============================
 
-void MachinePlcBuilder::BuildMachine()
+void MachinePlcBuilder::BuildMachine(string sectionName,LineMachine_t* lineMachine)
 {
+	MainDeviceProfile_t* mainDevPro = &lineMachine->mainDeviceProfile;
 
 	m_machine = new PlcMachine;
+
+	MachineContex* contex = new PlcContex("Fins",sectionName,lineMachine->Name,mainDevPro->IpAddress,mainDevPro->Port);
+	m_machine->SetMachineContex(contex);
 }
 
 void MachinePlcBuilder::BuildMainDeviceProfile(MainDeviceProfile_t *mainDevPro)
@@ -100,15 +124,42 @@ void MachinePlcBuilder::BuildMainDeviceProfile(MainDeviceProfile_t *mainDevPro)
 	}
 
 	
-	//m_machine
+
+	for (vector<StationEventProfile_t*>::const_iterator iter = mainDevPro->mainEvents.begin();iter != mainDevPro->mainEvents.end();iter++) {
+		StationEventProfile_t* sep = *iter;
+
+		Event* ev = NULL;
+		struct EvPara ev_para = 
+		{
+			.eventName = sep->Name,
+			.eventAction = sep->Action,
+			.plcEventAddr = sep->PlcBlockAddress,
+			.plcDataSize = sep->PlcBlockSize,
+			.eapEventAddr = sep->EapBlockAddress,
+			.eapDataSize = sep->EapBlockSize,
+			.flag = sep->Flag
+		};
+
+
+		ev = BuildEvent(sep->Action,&ev_para);
+		if (ev == NULL){
+			continue;
+		}
+
+		ev->SetMachineContex(m_machine->GetMachineContex());
+
+		m_machine->PushMainEvent(ev_para.eventName,ev);
+	}
+	
 }
+
 
 
 #define PARA_INPUT(sep)  sep->Name,sep->Action,sep->PlcBlockAddress,sep->PlcBlockSize, \
 						sep->EapBlockAddress,sep->EapBlockSize,sep->Flag
 
 
-void MachinePlcBuilder::BuildMainEvents(vector<StationEventProfile_t*>* mainEvList)
+void MachinePlcBuilder::BuildCustomEvents(vector<StationEventProfile_t*>* mainEvList)
 {
 	if (m_machine == NULL){
 		printf("%s:%d  m_machine is null!\n",__FILE__,__LINE__);
@@ -131,23 +182,18 @@ void MachinePlcBuilder::BuildMainEvents(vector<StationEventProfile_t*>* mainEvLi
 		};
 
 
-		if (sep->Action == "Register") {
-			ev = new Ev_Register(&ev_para);
-		} else if (sep->Action == "Register") {
-			ev = new Ev_EapCommand(&ev_para);
-		} else {
-			printf("%s:%d  Action is not exist!\n",__FILE__,__LINE__);
+		ev = BuildEvent(sep->Action,&ev_para);
+		if (ev == NULL){
 			continue;
 		}
 
-		m_machine->PushMainEvent(ev_para.eventName,ev);
+		ev->SetMachineContex(m_machine->GetMachineContex());
+
+		m_machine->PushStationsEvent(ev_para.eventName,ev);
 	}
 
 }
-/* std::string eventName,  std::string eventAction \
-		std::string plcEventAddr,unsigned int plcDataSize, \
-		std::string eapEventAddr,unsigned int eapDataSize, \
-		std::string flag */
+
 //////////////////////////////////////////////////// Director //////////////////////////////////////////////////////////////
 
 Director::Director()
@@ -167,9 +213,9 @@ void Director::ConstructMachine(string sectionName,LineMachine_t* lineMachine)
 		return;
 	}
 
-	m_builder->BuildMachine();
+	m_builder->BuildMachine(sectionName,lineMachine);
 	
-	m_builder->BuildMainEvents(lineMachine->p_mainEvents);
+	m_builder->BuildCustomEvents(lineMachine->p_mainEvents);
 	m_builder->BuildMainDeviceProfile(&lineMachine->mainDeviceProfile);
 
 	Machine* mc = m_builder->GetMachine();
@@ -243,7 +289,10 @@ void MachineScheduler::FlashLineMachineList()
 		if(lm_list!=NULL){
 			for (vector<LineMachine_t*>::const_iterator iter = lm_list->begin(); iter != lm_list->end(); iter++){
 				LineMachine_t* lineMachine = *iter;
-				m_plcDirector->ConstructMachine((*iter_sec)->Name,lineMachine);
+				MainDeviceProfile_t* mainDevPro = &lineMachine->mainDeviceProfile;
+				if (mainDevPro->DeviceType == "PLC" && lineMachine->Enable == true) {
+					m_plcDirector->ConstructMachine((*iter_sec)->Name,lineMachine);
+				}
 			}
 		}
 	}
