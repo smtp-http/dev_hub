@@ -52,12 +52,16 @@ Event* Machine::GetEvent(string evName)
 
 void Machine::PushMainEvent(string name,Event* ev)
 {
-	m_mainEvents[name,ev];
+	if (!m_mainEvents.count(name))
+		m_mainEvents.insert (make_pair (name,ev));
+		//m_mainEvents.insert(make)
 }
 
 void Machine::PushStationsEvent(string name,Event* ev)
 {
-	m_stationsEvents[name,ev];
+	//m_stationsEvents[name] = ev;
+	if (!m_mainEvents.count(name))
+		m_mainEvents.insert (make_pair (name,ev));
 }
 
 //=================================
@@ -95,6 +99,7 @@ void MachinePlcBuilder::BuildMainDeviceProfile(MainDeviceProfile_t *mainDevPro)
 		return;
 	}
 
+	
 	//m_machine
 }
 
@@ -114,19 +119,30 @@ void MachinePlcBuilder::BuildMainEvents(vector<StationEventProfile_t*>* mainEvLi
 		StationEventProfile_t* sep = *iter;
 
 		Event* ev = NULL;
+		struct EvPara ev_para = 
+		{
+			.eventName = sep->Name,
+			.eventAction = sep->Action,
+			.plcEventAddr = sep->PlcBlockAddress,
+			.plcDataSize = sep->PlcBlockSize,
+			.eapEventAddr = sep->EapBlockAddress,
+			.eapDataSize = sep->EapBlockSize,
+			.flag = sep->Flag
+		};
+
 
 		if (sep->Action == "Register") {
-			ev = new Ev_Register(sep->Name,sep->Action,sep->PlcBlockAddress,sep->PlcBlockSize, \
-						sep->EapBlockAddress,sep->EapBlockSize,sep->Flag);
+			ev = new Ev_Register(&ev_para);
 		} else if (sep->Action == "Register") {
-			ev = new Ev_EapCommand(PARA_INPUT(sep));
+			ev = new Ev_EapCommand(&ev_para);
 		} else {
 			printf("%s:%d  Action is not exist!\n",__FILE__,__LINE__);
-			return;
+			continue;
 		}
 
-		m_machine->
+		m_machine->PushMainEvent(ev_para.eventName,ev);
 	}
+
 }
 /* std::string eventName,  std::string eventAction \
 		std::string plcEventAddr,unsigned int plcDataSize, \

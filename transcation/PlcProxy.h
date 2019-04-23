@@ -25,7 +25,10 @@ public:
 	MachineContex(){}
 	virtual ~MachineContex(){}
 
-	void SetConnectionContex(void *contex){m_connectionContex = contex;}
+	void SetConnectionContex(void *contex){m_connectionContex = contex;}  // for example: struct fins_sys_tp *m_sys;
+	std::string SectionName(){return m_sectionName;}
+	std::string MachineName(){return m_machineName;}
+	
 protected:
 	void* m_connectionContex;
 
@@ -34,6 +37,9 @@ protected:
 
 	Protocol* m_protocol;
 	std::string m_protocolType;
+
+	std::string m_sectionName;
+	std::string m_machineName;
 };
 
 

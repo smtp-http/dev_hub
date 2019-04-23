@@ -27,14 +27,12 @@ int GetEventProfile(StationEventProfile_t *event,TiXmlNode *StationEventProfileN
 	} else if(!strcmp(profileElement->Value(),"Properties")) {
 		event->Properties = profileElement->GetText();
 	}else if(!strcmp(profileElement->Value(),"PlcBlockAddress")) {
-		string addr = profileElement->GetText();
-		event->PlcBlockAddress = strtoul(addr.c_str(), NULL, 10);
+		event->PlcBlockAddress = profileElement->GetText();
 	}else if(!strcmp(profileElement->Value(),"PlcBlockSize")) {
 		string size = profileElement->GetText();
 		event->PlcBlockSize = strtoul(size.c_str(), NULL, 10);
 	}else if(!strcmp(profileElement->Value(),"EapBlockAddress")) {
-		string addr = profileElement->GetText();
-		event->EapBlockAddress = strtoul(addr.c_str(), NULL, 10);
+		event->EapBlockAddress = profileElement->GetText();
 	}else if(!strcmp(profileElement->Value(),"EapBlockSize")) {
 		string addr = profileElement->GetText();
 		event->EapBlockSize = strtoul(addr.c_str(), NULL, 10);

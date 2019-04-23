@@ -16,9 +16,9 @@ typedef struct StationEventProfile
 	string Action;
 	string Flag;
 	string Properties;
-	int PlcBlockAddress;        // 
+	string PlcBlockAddress;        // 
 	unsigned int PlcBlockSize;
-	int EapBlockAddress;        // 
+	string EapBlockAddress;        // 
 	unsigned int EapBlockSize;
 } StationEventProfile_t;
 

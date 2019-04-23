@@ -32,7 +32,9 @@ public:
 
 	void PushLineStation(std::string name,LineStation_t* ls)
 	{
-		m_stations[name,ls];
+		//m_stations[name,ls];
+		if (!m_stations.count(name))
+			m_stations.insert (make_pair (name,ls));
 	}
 
 protected:
