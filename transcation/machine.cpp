@@ -100,6 +100,9 @@ PlcMachine::~PlcMachine()
 	
 }
 
+
+
+
 ////////////////////////////////////////////////////  Builder //////////////////////////////////////////////////////////////
 
 
@@ -114,6 +117,15 @@ void MachinePlcBuilder::BuildMachine(string sectionName,LineMachine_t* lineMachi
 
 	MachineContex* contex = new PlcContex("Fins",sectionName,lineMachine->Name,mainDevPro->IpAddress,mainDevPro->Port);
 	m_machine->SetMachineContex(contex);
+
+	// connect to plc
+	PlcProxy* proxy = contex->GetProxy();
+	if (proxy == NULL){
+		printf("%s:%d  proxy is null!\n",__FILE__,__LINE__);
+		return;
+	}
+
+	proxy->PlcConnect(contex);
 }
 
 void MachinePlcBuilder::BuildMainDeviceProfile(MainDeviceProfile_t *mainDevPro)
@@ -232,6 +244,7 @@ void Director::ConstructMachine(string sectionName,LineMachine_t* lineMachine)
 void Director::MachinesPolling()
 {
 	map<string,Machine*>::iterator it;   
+
     for(it=m_machines.begin();it!=m_machines.end();++it) {
         //cout<<"key: "<<it->first <<" value: "<<it->second<<endl; 
         it->second->EventPolling();
@@ -242,6 +255,7 @@ void Director::MachinesPolling()
 int Director::WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,char *data)
 {
 	Machine *m = m_machines[sectionName + machineName];
+
 	if(m == NULL) {
 		return NO_SECTIONNAME_OR_MACINENAME;
 	}

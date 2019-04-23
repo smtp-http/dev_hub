@@ -37,7 +37,7 @@ void Event::SniffingPlcEvent()
 	char rd_buf[EV_DATA_BUFF_LEN];
 	string addr = m_flag + m_plcEventAddr;
 
-	PlcProxy* plcProxy = &PlcProxy::Instance();
+	PlcProxy* plcProxy = m_machineContex->GetProxy();//&PlcProxy::Instance();
 	
 	if (m_machineContex == NULL) {
 		printf("m_machineContex is NULL!  return.\n" );
@@ -52,6 +52,11 @@ void Event::SniffingPlcEvent()
 	}
 }
 
+
+void Event::SendEapData(char* data)
+{
+
+}
 
 
 //======================  Ev_register ======================

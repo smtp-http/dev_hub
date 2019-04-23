@@ -61,7 +61,7 @@ public:
 	virtual ~Event(){}
 
 	void SniffingPlcEvent();
-	virtual void SendEapData(char* data) = 0;
+	virtual void SendEapData(char* data);
 
 	void SetMachineContex(MachineContex* mc)
 	{

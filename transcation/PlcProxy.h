@@ -3,20 +3,7 @@
 
 #include <string>
 
-
-////////////////////////// Protocol /////////////////////////
-class Protocol
-{
-
-};
-
-class FinsProtocol : public Protocol
-{
-
-};
-
-Protocol* GetProtocol(std::string name);
-
+class PlcProxy;
 /////////////////////////// PclContex /////////////////////////
 
 class MachineContex
@@ -29,13 +16,15 @@ public:
 	std::string SectionName(){return m_sectionName;}
 	std::string MachineName(){return m_machineName;}
 
+	PlcProxy* GetProxy(){return m_proxy;}
+
 protected:
 	void* m_connectionContex;
 
 	std::string m_ip;
 	unsigned int m_port;
 
-	Protocol* m_protocol;
+	PlcProxy* m_proxy;
 	std::string m_protocolType;
 
 	std::string m_sectionName;
@@ -59,21 +48,34 @@ private:
 class PlcProxy
 {
 public:
-	~PlcProxy();
-	int PlcConnect(MachineContex*);
+	PlcProxy();
+	virtual ~PlcProxy();
 
-	static PlcProxy& Instance();
-
-	void PlcWriteWorlds(MachineContex*,char* data,unsigned int long);
-	unsigned int PlcReadWorlds(MachineContex*,std::string plcAddr,char* recvBuf);
+	virtual void on_disconnect(MachineContex*) = 0;
+	virtual int PlcConnect(MachineContex*) = 0;
+	virtual void PlcWriteWorlds(MachineContex*,char* data,unsigned int) = 0;
+	virtual unsigned int PlcReadWorlds(MachineContex*,std::string plcAddr,char* recvBuf) = 0;
 
 private:
-	PlcProxy();
+	int m_connectionStatus;
 	
 };
 
+class FinsPlcProxy : public PlcProxy
+{
+public:
+	FinsPlcProxy(){}
+	virtual ~FinsPlcProxy(){}
+
+	virtual void on_disconnect(MachineContex*);
+	virtual int PlcConnect(MachineContex*);
+	virtual void PlcWriteWorlds(MachineContex*,char* data,unsigned int);
+	virtual unsigned int PlcReadWorlds(MachineContex*,std::string plcAddr,char* recvBuf);
+};
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+PlcProxy* GetPlcProxy(std::string name);
 
 
 #endif

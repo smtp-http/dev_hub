@@ -11,6 +11,9 @@
 #define OK 0
 #define NO_SECTIONNAME_OR_MACINENAME -1
 
+#define CONNECTION_STATUS_BUSY 0
+#define CONNECTION_STATUS_IDEL 1
+
 
 ///////////////////////////////// Machine /////////////////////////////////////////
 
@@ -40,6 +43,7 @@ public:
 	void SetMachineContex(MachineContex* mc){m_contex = mc;}
 	MachineContex* GetMachineContex(){return m_contex;}
 
+
 protected:
 	std::map<std::string,Event*> m_mainEvents;
 	std::map<std::string,Event*> m_stationsEvents;
@@ -47,7 +51,7 @@ protected:
 
 	void SetEvUpdater(IEventUpdater* eu){m_evUpdater = eu;}
 
-	//Protocol *m_protocol;
+	PlcProxy* m_proxy;
 	MachineContex* m_contex;
 	
 private:
@@ -61,6 +65,7 @@ class PlcMachine : public Machine
 public:
 	PlcMachine();
 	virtual ~PlcMachine();
+
 };
 
 

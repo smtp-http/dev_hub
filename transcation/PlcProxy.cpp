@@ -3,12 +3,13 @@
 using namespace std;
 
 
-Protocol* GetProtocol(string name)
+PlcProxy* GetPlcProxy(string name)
 {
-	static FinsProtocol fp;
+	FinsPlcProxy *fp;
 
 	if(name == "Fins") {
-		return &fp;
+		FinsPlcProxy* fp = new FinsPlcProxy;
+		return fp;
 	} else {
 		return NULL;
 	}
@@ -20,7 +21,7 @@ PlcContex::PlcContex(std::string protoName,std::string sectionName,std::string m
 	m_protocolType = protoName;
 	m_ip = ip;
 	m_port = port;
-	m_protocol = GetProtocol(protoName);
+	m_proxy = GetPlcProxy(protoName);
 
 	m_sectionName = sectionName;
 	m_machineName = machineName;
@@ -41,27 +42,29 @@ PlcProxy::~PlcProxy()
 }
 
 
-PlcProxy& PlcProxy::Instance()
-{
-	static PlcProxy _instance;
-	return _instance;
-}
+//======================== FinsPlcProxy ===============================
 
-
-int PlcProxy::PlcConnect(MachineContex *pc)
+void FinsPlcProxy::on_disconnect(MachineContex* mc)
 {
 
 }
 
 
-void PlcProxy::PlcWriteWorlds(MachineContex *pc,char* data,unsigned int long)
+int FinsPlcProxy::PlcConnect(MachineContex* mc)
 {
 
 }
 
 
-unsigned int PlcProxy::PlcReadWorlds(MachineContex *pc,string plcAddr,char* recvBuf)
+void FinsPlcProxy::PlcWriteWorlds(MachineContex* mc,char* data,unsigned int len)
 {
 
 }
+
+
+unsigned int FinsPlcProxy::PlcReadWorlds(MachineContex* mc,std::string plcAddr,char* recvBuf)
+{
+
+}
+
 
