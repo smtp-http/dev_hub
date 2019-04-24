@@ -30,7 +30,7 @@ struct EvPara
 class IEventUpdater
 {
 public:
-	virtual void UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,char* data,unsigned int len) = 0;
+	virtual void UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,unsigned char* data,unsigned int len) = 0;
 };
 
 class ev_reciver : public IEventUpdater
@@ -39,8 +39,9 @@ public:
 	virtual ~ev_reciver();
 
 	static ev_reciver& GetInstance();
-	virtual void UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,char* data,unsigned int len);
+	virtual void UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,unsigned char* data,unsigned int len);
 
+	friend class Director;
 private:
 	ev_reciver();
 
@@ -61,7 +62,7 @@ public:
 	virtual ~Event(){}
 
 	void SniffingPlcEvent();
-	virtual void SendEapData(char* data);
+	virtual void SendEapData(unsigned char* data);
 
 	void SetMachineContex(MachineContex* mc)
 	{
@@ -100,7 +101,7 @@ public:
 	//Ev_Register();
 	virtual ~Ev_Register(){}
 
-	virtual void SendEapData(char* data);
+//	virtual void SendEapData(unsigned char* data);
 };
 
 
@@ -112,7 +113,7 @@ public:
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_EapCommand(){}
-	virtual void SendEapData(char* data);
+//	virtual void SendEapData(unsigned char* data);
 };
 
 

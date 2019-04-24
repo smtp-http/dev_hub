@@ -91,6 +91,7 @@ void Machine::OnTimer(TimerID tid)
 	cout << "machine OnTimer " << tid << endl;
 	if (tid == m_valuePolling) {
 		cout << "event pollint" << endl;
+		EventPolling();
 	}
 }
 
@@ -219,8 +220,9 @@ void MachinePlcBuilder::BuildCustomEvents(vector<StationEventProfile_t*>* mainEv
 //////////////////////////////////////////////////// Director //////////////////////////////////////////////////////////////
 
 Director::Director()
+	: m_evReciver(&ev_reciver::GetInstance())
 {
-
+	m_evReciver->m_client->SetFrameRecver(this);
 }
 
 Director::~Director()
@@ -262,7 +264,7 @@ void Director::MachinesPolling()
 }
 
 
-int Director::WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,char *data)
+int Director::WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,unsigned char *data)
 {
 	Machine *m = m_machines[sectionName + machineName];
 
@@ -275,6 +277,10 @@ int Director::WriteMachineData(std::string sectionName,std::string machineName,s
 	ev->SendEapData(data);
 } 
 
+bool Director::OnFrame(string& frame)
+{
+	
+}
 
 ///////////////////////////////////////////////////  MachineScheduler /////////////////////////////////////////////////////
 

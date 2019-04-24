@@ -25,16 +25,18 @@ ev_reciver& ev_reciver::GetInstance()
 	return _instance;
 }
 
-void ev_reciver::UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,char* eventData,unsigned int len)
+void ev_reciver::UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,unsigned char* eventData,unsigned int len)
 {
 
 }
+
+
 
 //////////////////////////////////////// event ///////////////////////////////
 
 void Event::SniffingPlcEvent()
 {
-	char rd_buf[EV_DATA_BUFF_LEN];
+	unsigned char rd_buf[EV_DATA_BUFF_LEN];
 	string addr = m_flag + m_plcEventAddr;
 
 	PlcProxy* plcProxy = m_machineContex->GetProxy();//&PlcProxy::Instance();
@@ -44,7 +46,7 @@ void Event::SniffingPlcEvent()
 		return;
 	}
 
-	unsigned int len = plcProxy->PlcReadWorlds(m_machineContex,addr,rd_buf);
+	unsigned int len = plcProxy->PlcReadWorlds(addr,rd_buf,m_plcDataSize);
 	for(int i = 0;i < m_plcDataSize;i ++) {
 		if(m_lastData[i] != rd_buf[i]) 
 			m_evUpdater->UpdateEvent(m_machineContex->SectionName(),m_machineContex->MachineName(),m_eventName,rd_buf,m_plcDataSize);
@@ -53,17 +55,19 @@ void Event::SniffingPlcEvent()
 }
 
 
-void Event::SendEapData(char* data)
+void Event::SendEapData(unsigned char* data)
 {
-
+	PlcProxy* plcProxy = m_machineContex->GetProxy();
+	string addr = m_flag + m_eapEventAddr;
+	plcProxy->PlcWriteWorlds(addr,data,m_eapDataSize);
 }
 
 
 //======================  Ev_register ======================
 
 
-
-void Ev_Register::SendEapData(char *data)
+#if 0
+void Ev_Register::SendEapData(unsigned char *data)
 {
 
 }
@@ -72,8 +76,9 @@ void Ev_Register::SendEapData(char *data)
 
 
 
-void Ev_EapCommand::SendEapData(char *data)
+void Ev_EapCommand::SendEapData(unsigned char *data)
 {
 
 }
 
+#endif

@@ -111,15 +111,20 @@ int FinsPlcProxy::PlcConnect(MachineContex* mc)
 }
 
 
-void FinsPlcProxy::PlcWriteWorlds(MachineContex* mc,char* data,unsigned int len)
-{
 
+int FinsPlcProxy::PlcWriteWorlds(string dataAddr,unsigned char* data,unsigned int len)
+{
+	int ret;
+	ret = finslib_memory_area_write_word((struct fins_sys_tp*)m_plcConnectHandle,dataAddr.c_str(),data,len);
+
+	return ret;
 }
 
 
-unsigned int FinsPlcProxy::PlcReadWorlds(MachineContex* mc,string plcAddr,char* recvBuf)
+//( struct fins_sys_tp *sys, const char *start, unsigned char *data, size_t num_word );
+int FinsPlcProxy::PlcReadWorlds(string plcAddr,unsigned char* recvBuf,unsigned int recvLen)
 {
-
+	return finslib_memory_area_read_word((struct fins_sys_tp*)m_plcConnectHandle,plcAddr.c_str(),recvBuf,recvLen);
 }
 
 

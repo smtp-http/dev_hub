@@ -58,8 +58,8 @@ public:
 
 	virtual void on_disconnect(MachineContex*) = 0;
 	virtual int PlcConnect(MachineContex*) = 0;
-	virtual void PlcWriteWorlds(MachineContex*,char* data,unsigned int) = 0;
-	virtual unsigned int PlcReadWorlds(MachineContex*,std::string plcAddr,char* recvBuf) = 0;
+	virtual int PlcWriteWorlds(std::string,unsigned char* data,unsigned int) = 0;
+	virtual int PlcReadWorlds(std::string plcAddr,unsigned char* recvBuf,unsigned int recvLen) = 0;
 
 protected:
 	virtual void OnTimer(TimerID tid){}
@@ -80,8 +80,8 @@ public:
 
 	virtual void on_disconnect(MachineContex*);
 	virtual int PlcConnect(MachineContex*);
-	virtual void PlcWriteWorlds(MachineContex*,char* data,unsigned int);
-	virtual unsigned int PlcReadWorlds(MachineContex*,std::string plcAddr,char* recvBuf);
+	virtual int PlcWriteWorlds(std::string,unsigned char* data,unsigned int);
+	virtual int PlcReadWorlds(std::string plcAddr,unsigned char* recvBuf,unsigned int recvLen);
 
 	virtual void OnTimer(TimerID tid);
 };

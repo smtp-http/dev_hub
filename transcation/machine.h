@@ -99,7 +99,7 @@ public:
 };
 
 
-class Director
+class Director : public IFrameRecver
 {
 public:
 	Director();
@@ -109,11 +109,14 @@ public:
 
 	void MachinesPolling();
 
-	int WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,char *data);
+	int WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,unsigned char *data);
 
+	virtual bool OnFrame(string& frame);
+	
 protected:
 	Builder  *m_builder;
 	std::map<std::string,Machine*> m_machines;    // key = sectionName + machineName
+	ev_reciver* m_evReciver;
 };
 
 class PlcDirector : public Director

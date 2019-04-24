@@ -2,7 +2,7 @@
 #define __TCP_CLIENT_H__
 
 #include <string>
-//#include <list>
+#include <vector>
 #include <iostream>
 //#include <algorithm>
 #include "connbase.h"
@@ -11,41 +11,14 @@
 using namespace std;
 using namespace lux;
 
-#if 0
-class TcpClient : public IConnectorAcceptorSink, public IConnectionSink, public ITimerUserSink
+
+class IFrameRecver
 {
 public:
-	TcpClient(std::string peerAddr, short peerPort)
-		: m_peerAddr(peerAddr)
-		, m_peerPort(peerPort)
-		, m_connector(NULL)
-		, m_connection(NULL)
-		, m_timerReconn(-1)
-		, m_timerTest(-1)
-	{
-	}
-	~TcpClient(){}
-
-	virtual bool Connect();
-protected:
-	virtual void OnConnection(Connection *conn, IConnectorAcceptor *ca);
-
-	virtual void OnData(const char *buf, int length, Connection *conn);
-
-	virtual void OnWrite(Connection *conn);
-	virtual void OnDisconnect(int reason, Connection *conn);
-
-	virtual void OnTimer(TimerID tid);
-private:
-	std::string m_peerAddr;
-	short m_peerPort;
-	Connector *m_connector;
-	Connection *m_connection;
-	TimerID m_timerReconn;
-	TimerID m_timerTest;
+	virtual bool OnFrame(string& frame) = 0;
 };
 
-#else
+
 class TcpClient : public IConnectorAcceptorSink, public IConnectionSink, public ITimerUserSink
 {
 	string m_peerAddr;
@@ -55,6 +28,8 @@ class TcpClient : public IConnectorAcceptorSink, public IConnectionSink, public 
 	TimerID m_timerReconn;
 	TimerID m_timerTest;
 
+	IFrameRecver* m_frameRecver;
+	vector<char> m_rdBuffer;
 public:
 	TcpClient(const string &peerAddr, short peerPort)
 		: m_peerAddr(peerAddr)
@@ -63,10 +38,17 @@ public:
 		, m_connection(NULL)
 		, m_timerReconn(-1)
 		, m_timerTest(-1)
+		, m_frameRecver(NULL)
 	{
 	}
 
-	bool Connect(){
+	void SetFrameRecver(IFrameRecver *fr)
+	{
+		m_frameRecver = fr;
+	}
+
+	bool Connect()
+	{
 		if (m_connector)
 			return true;
 		m_connector = new Connector(m_peerAddr, m_peerPort, this);
@@ -106,10 +88,38 @@ protected:
 
 	virtual void OnData(const char *buf, int length, Connection *conn){
 		cout << "OnData" << endl;
-		string s(buf, length);
-		cout << "recv: " << s << endl;
+		//string s(buf, length);
+		//cout << "recv: " << s << endl;
 		//conn->Send(buf, length);
 		//EventLooper::GetInstance().StopEventLoop(3000);
+		int i,len = length,count = 0;
+		string newFrame;
+		int pos=0;
+		len =0;
+
+		
+		if(buf == NULL){
+			printf("buf == NULL , [%s][%s][%d]\n",__FILE__,__PRETTY_FUNCTION__,__LINE__);
+		}
+
+	    
+		for(i=0;i<length;i++){
+			if(buf[i] == '\0'){
+				len = i-pos;
+				pos = i;
+				newFrame.clear();
+				newFrame.assign(m_rdBuffer.begin(),m_rdBuffer.end());
+				len += m_rdBuffer.size();
+
+				if(len>1){
+					if(m_frameRecver != NULL)
+						m_frameRecver->OnFrame(newFrame);
+					m_rdBuffer.clear();
+				}
+			} else {
+				m_rdBuffer.push_back(buf[i]);
+			}        
+		}
 	}
 
 	virtual void OnWrite(Connection *conn){
@@ -145,8 +155,6 @@ protected:
 		}
 	}
 };
-
-#endif
 
 
 
