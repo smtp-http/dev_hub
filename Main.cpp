@@ -10,7 +10,7 @@
 #include <algorithm>
 #include "json/json.h"
 #include "connbase.h"
-#include "mqtt.h"
+//#include "mqtt.h"
 //#include "eventlooper.h"
 #include "eventlooperimp.h"
 #include "TcpServer.h"
@@ -168,7 +168,7 @@ int main(int argc, char **argv)
 	daemon(1, 1);
 	process_keepalive();
 #endif
-
+#endif
 	EventLooperImp &el = (EventLooperImp&)EventLooper::GetInstance();
 	cout << "-- event base: " << el.CurrentEvBase() << endl;
 	el.RunEventLoop();
@@ -176,7 +176,7 @@ int main(int argc, char **argv)
 	cout << "======***====" << endl;
 
     return 0;
-#endif
+
 }
 
 

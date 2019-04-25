@@ -1,6 +1,6 @@
 ################  TOOLCHAIN ########################
 #export TOOLCHAIN_NAME = arm-none-linux-gnueabi-
-export TOOLCHAIN_NAME = arm-linux-gnueabihf-
+#export TOOLCHAIN_NAME = arm-linux-gnueabihf-
 export CC = $(TOOLCHAIN_NAME)gcc
 export CXX = $(TOOLCHAIN_NAME)g++ -g
 export STRIP = $(TOOLCHAIN_NAME)strip
