@@ -13,7 +13,7 @@ using namespace std;
 Event* BuildEvent(string action,struct EvPara* ev_para)
 {
 	Event* ev = NULL;
-
+#if 0
 	if (action == "Register") {
 		ev = new Ev_Register(ev_para);
 	} else if (action == "Register") {
@@ -22,7 +22,10 @@ Event* BuildEvent(string action,struct EvPara* ev_para)
 		printf("%s:%d  Action is not exist!\n",__FILE__,__LINE__);
 		return NULL;
 	}
+#else 
+	ev = new Event(ev_para);
 
+#endif
 	return ev;
 }
 
@@ -311,7 +314,8 @@ LineStationDesiginProfile_t* GetLineStationDesiginProfile(std::string xmlFile);
 
 void MachineScheduler::FlashLineMachineList()
 {
-	LineStationDesiginProfile_t *ls = GetLineStationDesiginProfile("demotest.xml");
+	cout << "======= : " << SysConfig::Instance().GetPluginLineDesignerXml() << endl;
+	LineStationDesiginProfile_t *ls = GetLineStationDesiginProfile(SysConfig::Instance().GetPluginLineDesignerXml());
 	
 	for (vector<LineSection_t*>::const_iterator iter_sec = ls->LineSections->begin();iter_sec != ls->LineSections->end();iter_sec++) {
 		m_sections[(*iter_sec)->Name] = *iter_sec;

@@ -140,8 +140,10 @@ void transcationTest()
 #include "machine.h"
 int main(int argc, char **argv)
 {
-	MachineScheduler& m = MachineScheduler::GetInstance("demotest.xml");
-
+	SysConfig::Instance().LoadConfig();
+	//MachineScheduler& m = MachineScheduler::GetInstance("demotest.xml");   
+	cout << "--------: " << SysConfig::Instance().GetPluginLineDesignerXml() << "  --- : " << SysConfig::Instance().GetUperComputerIp() << endl;
+	MachineScheduler& m = MachineScheduler::GetInstance(SysConfig::Instance().GetPluginLineDesignerXml());
 #if 0
 	vector<StationEventProfile_t*> *m = GetAllStationEventProfile("demotest.xml");
 	//TranscationManager &tm = TranscationManager::GetInstance();

@@ -9,7 +9,7 @@ using namespace std;
 using namespace lux;
 
 //#define CONFIG_FILE "config.json"
-#define CONFIG_FILE "new_config.json"
+#define CONFIG_FILE "config.json"
 
 //从文件中读取JSON
 int SysConfig::LoadUserConfig(IConfigUser &user)
@@ -61,9 +61,10 @@ int SysConfig::LoadConfig()
 			if (user != NULL)
 				user->Update(root);
 		}
-
-		uperComputerIp = root["UperComputerIp"].asString();
+		cout << "************ " << root << endl;
+		uperComputerIp = root["UperComputerIp"].asString(); cout << uperComputerIp << endl;
 		uperComputerPort = root["UperComputerPort"].asInt();
+		pluginLineDesignerXml = root["PluginLineDesignerXml"].asString();
 		
 #if 0
 	//读取根节点信息

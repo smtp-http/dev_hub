@@ -59,6 +59,12 @@ public:
 		memset(m_lastData,0,EV_DATA_BUFF_LEN);
 	}
 
+	Event(struct EvPara* ev_para)
+	{
+		memset(m_lastData,0,EV_DATA_BUFF_LEN);
+		EV_PARAM_INIT(ev_para)
+	}
+
 	virtual ~Event(){}
 
 	void SniffingPlcEvent();

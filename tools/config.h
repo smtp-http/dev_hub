@@ -24,6 +24,7 @@ public:
 	std::string GetUperComputerIp(){return uperComputerIp;}
 	short GetUperComputerPort(){return uperComputerPort;}
 	std::string GetPlcProtocol(){return plcProtocol;}
+	std::string GetPluginLineDesignerXml(){return pluginLineDesignerXml;}
 private:
 	SysConfig(){}
 	std::list<IConfigUser *> m_users;
@@ -31,6 +32,7 @@ private:
 	std::string uperComputerIp;
 	short uperComputerPort;
 	std::string plcProtocol;
+	std::string pluginLineDesignerXml;
 };
 
 
