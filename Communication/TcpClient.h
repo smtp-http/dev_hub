@@ -59,17 +59,8 @@ protected:
 		if (conn){
 			//cout << "Client: connected succeed to " << conn->GetPeerAddress() << ":" << conn->GetPeerPort() << endl;
 			m_connection = conn;
-
-			string msg("hello, libevent!");
 			conn->SetConnectionSink(this);
-			//conn->Send(msg.c_str(), msg.length());
-			struct timeval tv={0, 500*1000};
-			m_timerTest = EventLooper::GetInstance().ScheduleTimer(&tv, TF_FIRE_PERIODICALLY, this);
 
-			if (m_timerReconn != -1){
-				EventLooper::GetInstance().CancelTimer(m_timerReconn);
-				m_timerReconn = -1;
-			}
 		} else {
 			cout << "Client: connect to " << m_peerAddr << ":" << m_peerPort << " failed." << endl;
 		}
@@ -88,10 +79,6 @@ protected:
 
 	virtual void OnData(const char *buf, int length, Connection *conn){
 		cout << "OnData" << endl;
-		//string s(buf, length);
-		//cout << "recv: " << s << endl;
-		//conn->Send(buf, length);
-		//EventLooper::GetInstance().StopEventLoop(3000);
 		int i,len = length,count = 0;
 		string newFrame;
 		int pos=0;
@@ -133,10 +120,6 @@ protected:
 		m_connection = NULL;
 
 		EventLooper &el = EventLooper::GetInstance();
-		if (m_timerTest != -1){
-			el.CancelTimer(m_timerTest);
-			m_timerTest = -1;
-		}
 
 		el.StopEventLoop(100);
 	}
@@ -144,12 +127,7 @@ protected:
 	virtual void OnTimer(TimerID tid)
 	{
 		//cout << "OnTimer " << tid << endl;
-		if (tid == m_timerTest){
-			if (m_connection){
-				string msg("Time data");
-				m_connection->Send(msg.data(), msg.length());
-			}
-		} else if(tid == m_timerReconn){
+		if(tid == m_timerReconn){
 			cout << "start to reconnecting ... " << endl;
 			Connect();
 		}

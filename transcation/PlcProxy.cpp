@@ -55,10 +55,7 @@ PlcProxy::~PlcProxy()
 
 void FinsPlcProxy::OnTimer(TimerID tid)
 {
-
-	cout << "proxy OnTimer " << tid << endl;
 	if (tid == m_reconnect) {
-		cout << "m_reconnect_timer: " << this << endl;
 		if ( m_plcConnectHandle == NULL) {
 			cout << "m_reconnect" << endl;
 			if(m_contex != NULL){
