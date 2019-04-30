@@ -49,7 +49,7 @@ protected:
 	std::map<std::string,Event*> m_stationsEvents;
 	std::map<std::string,LineStation_t*> m_stations;
 
-	void SetEvUpdater(IEventUpdater* eu){m_evUpdater = eu;}
+	void SetEvUpdater(IEventUpdater& eu){m_evUpdater = eu;}
 
 	PlcProxy* m_proxy;
 	MachineContex* m_contex;
@@ -58,7 +58,7 @@ protected:
 	
 private:
 	std::string m_name;
-	IEventUpdater* m_evUpdater;
+	IEventUpdater& m_evUpdater;
 };
 
 

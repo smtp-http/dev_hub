@@ -1,7 +1,7 @@
 {
   "Version": "1.0",
-  "UperComputerIp":"10.10.80.10",
-  "UperComputerPort" : 9600,
+  "UperComputerIp":"172.17.208.22",
+  "UperComputerPort" : 9601,
   "PluginLineDesignerXml":"Plugin.LineDesigner.xml",
   "uart1": {
     "devName": "/dev/ttyO1",

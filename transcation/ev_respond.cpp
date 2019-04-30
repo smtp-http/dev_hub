@@ -48,9 +48,15 @@ void Event::SniffingPlcEvent()
 
 	unsigned int len = plcProxy->PlcReadWorlds(addr,rd_buf,m_plcDataSize);
 	for(int i = 0;i < m_plcDataSize;i ++) {
-		if(m_lastData[i] != rd_buf[i]) 
-			m_evUpdater->UpdateEvent(m_machineContex->SectionName(),m_machineContex->MachineName(),m_eventName,rd_buf,m_plcDataSize);
+		if(m_lastData[i] != rd_buf[i]) {
+			//cout << "+++ :" << m_machineContex << endl;
+			//cout << "section name:" << m_machineContex->SectionName() << "   machine name:" << m_machineContex->MachineName() << "  event name:" << m_eventName << "   rd_buf:" << rd_buf << "     plc data size:" << m_plcDataSize << endl;
+			string sectionName = m_machineContex->SectionName();
+			string machineName = m_machineContex->MachineName();
+			//cout << "--- this:" << this << "   ev uper:" << m_evUpdater << endl;
+			m_evUpdater.UpdateEvent(sectionName,machineName,m_eventName,rd_buf,m_plcDataSize);
 			break;
+		}
 	}
 }
 

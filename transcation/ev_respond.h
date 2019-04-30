@@ -53,13 +53,14 @@ private:
 class Event {
 public:
 	Event()
-		: m_evUpdater(&ev_reciver::GetInstance())
+		: m_evUpdater(ev_reciver::GetInstance())
 		, m_machineContex(NULL)
 	{
 		memset(m_lastData,0,EV_DATA_BUFF_LEN);
 	}
 
 	Event(struct EvPara* ev_para)
+		: m_evUpdater(ev_reciver::GetInstance())
 	{
 		memset(m_lastData,0,EV_DATA_BUFF_LEN);
 		EV_PARAM_INIT(ev_para)
@@ -88,14 +89,14 @@ protected:
 	std::string m_eapEventAddr;      // 
 	unsigned int m_eapDataSize;
 
-	IEventUpdater *m_evUpdater;
+	IEventUpdater& m_evUpdater;
 
 	MachineContex *m_machineContex;
 
 	char m_lastData[EV_DATA_BUFF_LEN];
 };
 
-
+/*
 class Ev_Register : public Event
 {
 public:
@@ -122,6 +123,6 @@ public:
 //	virtual void SendEapData(unsigned char* data);
 };
 
-
+*/
 
 #endif

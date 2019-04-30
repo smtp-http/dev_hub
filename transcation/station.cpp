@@ -202,7 +202,7 @@ vector<LineMachine_t*> *GetLineMachineList(TiXmlNode *MachineNode)
 							
 						} else if(!strcmp(MainDeviceProfileNode->Value(),"IpAddress")) {
 							machine->mainDeviceProfile.IpAddress = MainDeviceProfileNode->ToElement()->GetText();
-							
+							cout << "+++++++ ip address:" << machine->mainDeviceProfile.IpAddress << endl;
 						} else if(!strcmp(MainDeviceProfileNode->Value(),"PollFrequency")) {
 							string PollFrequency = MainDeviceProfileNode->ToElement()->GetText();
 							machine->mainDeviceProfile.PollFrequency = strtoul(PollFrequency.c_str(), NULL, 10);

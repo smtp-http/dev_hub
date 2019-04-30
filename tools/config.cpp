@@ -61,7 +61,7 @@ int SysConfig::LoadConfig()
 			if (user != NULL)
 				user->Update(root);
 		}
-		cout << "************ " << root << endl;
+		//cout << "************ " << root << endl;
 		uperComputerIp = root["UperComputerIp"].asString(); cout << uperComputerIp << endl;
 		uperComputerPort = root["UperComputerPort"].asInt();
 		pluginLineDesignerXml = root["PluginLineDesignerXml"].asString();

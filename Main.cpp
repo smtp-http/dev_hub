@@ -136,13 +136,21 @@ void transcationTest()
 	
 }
 
+#include <signal.h>
 
 #include "machine.h"
 int main(int argc, char **argv)
 {
+
+
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, SIGPIPE);
+    sigprocmask(SIG_BLOCK, &set, NULL);
+
 	SysConfig::Instance().LoadConfig();
 	//MachineScheduler& m = MachineScheduler::GetInstance("demotest.xml");   
-	cout << "--------: " << SysConfig::Instance().GetPluginLineDesignerXml() << "  --- : " << SysConfig::Instance().GetUperComputerIp() << endl;
+	//cout << "--------: " << SysConfig::Instance().GetPluginLineDesignerXml() << "  --- : " << SysConfig::Instance().GetUperComputerIp() << endl;
 	MachineScheduler& m = MachineScheduler::GetInstance(SysConfig::Instance().GetPluginLineDesignerXml());
 #if 0
 	vector<StationEventProfile_t*> *m = GetAllStationEventProfile("demotest.xml");

@@ -13,19 +13,9 @@ using namespace std;
 Event* BuildEvent(string action,struct EvPara* ev_para)
 {
 	Event* ev = NULL;
-#if 0
-	if (action == "Register") {
-		ev = new Ev_Register(ev_para);
-	} else if (action == "Register") {
-		ev = new Ev_EapCommand(ev_para);
-	} else {
-		printf("%s:%d  Action is not exist!\n",__FILE__,__LINE__);
-		return NULL;
-	}
-#else 
-	ev = new Event(ev_para);
 
-#endif
+	ev = new Event(ev_para);
+	cout << "=== ev:" << ev << endl;
 	return ev;
 }
 
@@ -33,6 +23,7 @@ Event* BuildEvent(string action,struct EvPara* ev_para)
 
 //////////////////////////////////////////////////////// Machine //////////////////////////////////////////////////////////
 Machine::Machine()
+	: m_evUpdater(ev_reciver::GetInstance())
 {
 	struct timeval tv2={0, 200};
 	m_valuePolling = EventLooper::GetInstance().ScheduleTimer(&tv2, TF_FIRE_PERIODICALLY, this);
@@ -91,9 +82,9 @@ void Machine::PushStationsEvent(string name,Event* ev)
 void Machine::OnTimer(TimerID tid)
 {
 	// TODO: event polling
-	cout << "machine OnTimer " << tid << endl;
+//	cout << "machine OnTimer " << tid << endl;
 	if (tid == m_valuePolling) {
-		cout << "event pollint" << endl;
+//		cout << "event pollint" << endl;
 		EventPolling();
 	}
 }
@@ -104,7 +95,7 @@ PlcMachine::PlcMachine()
 {
 	
 	ev_reciver& er = ev_reciver::GetInstance();
-	this->SetEvUpdater(&er);
+	this->SetEvUpdater(er);
 
 	
 }
@@ -166,9 +157,10 @@ void MachinePlcBuilder::BuildMainDeviceProfile(MainDeviceProfile_t *mainDevPro)
 			.flag = sep->Flag
 		};
 
-
+		cout << "build main:  ";
 		ev = BuildEvent(sep->Action,&ev_para);
 		if (ev == NULL){
+			printf("%s:%d  BuildEvent  null!\n",__FILE__,__LINE__);
 			continue;
 		}
 
@@ -207,9 +199,10 @@ void MachinePlcBuilder::BuildCustomEvents(vector<StationEventProfile_t*>* mainEv
 			.flag = sep->Flag
 		};
 
-
+		cout << "build custom:  ";
 		ev = BuildEvent(sep->Action,&ev_para);
 		if (ev == NULL){
+			printf("%s:%d  BuildEvent  null!\n",__FILE__,__LINE__);
 			continue;
 		}
 
