@@ -3,6 +3,7 @@
   "UperComputerIp":"172.17.208.22",
   "UperComputerPort" : 9601,
   "PluginLineDesignerXml":"Plugin.LineDesigner.xml",
+  "PollingCycle" : 200,
   "uart1": {
     "devName": "/dev/ttyO1",
     "BaudRate": 9600,

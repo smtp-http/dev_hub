@@ -13,9 +13,29 @@ using namespace std;
 Event* BuildEvent(string action,struct EvPara* ev_para)
 {
 	Event* ev = NULL;
+	cout << "===  event action:" << ev_para->eventAction << endl;
+	if (ev_para->eventAction == "Register")
+		ev = new Ev_Register(ev_para);
+	else if (ev_para->eventAction == "HeartBeat")
+		ev = new Ev_HeareBeat(ev_para);
+	else if (ev_para->eventAction == "EapCommand")
+		ev = new Ev_EapCommand(ev_para);
+	else if (ev_para->eventAction == "EventChangedFlag")
+		ev = new Ev_EventChangedFlag(ev_para);
+	else if (ev_para->eventAction == "NoticeText")
+		ev = new Ev_NoticeMessage(ev_para);
+	else if (ev_para->eventAction == "AlarmCode")
+		ev = new Ev_AlarmCode(ev_para);
+	else if (ev_para->eventAction == "MachineStatus")
+		ev = new Ev_MachineStatus(ev_para);
+	else if (ev_para->eventAction == "MachineYield")
+		ev = new Ev_MachineYield(ev_para);
+	else if (ev_para->eventAction == "BreakPoint")
+		ev = new Ev_BreakPoint(ev_para);
+	else
+		printf("%s:%d  Event action name is not exist!\n",__FILE__,__LINE__);
 
-	ev = new Event(ev_para);
-	cout << "=== ev:" << ev << endl;
+	//cout << "=== ev:" << ev << endl;
 	return ev;
 }
 
@@ -25,13 +45,20 @@ Event* BuildEvent(string action,struct EvPara* ev_para)
 Machine::Machine()
 	: m_evUpdater(ev_reciver::GetInstance())
 {
-	struct timeval tv2={0, 200};
-	m_valuePolling = EventLooper::GetInstance().ScheduleTimer(&tv2, TF_FIRE_PERIODICALLY, this);
+	struct timeval tv={0, SysConfig::Instance().GetPollingCycle()};
+	m_valuePolling = EventLooper::GetInstance().ScheduleTimer(&tv, TF_FIRE_PERIODICALLY, this);
+
+	unsigned int hb = (SysConfig::Instance().GetPollingCycle()*10)/1000;
+
+	struct timeval tv1={hb,0};
+
+	m_heartbeat = EventLooper::GetInstance().ScheduleTimer(&tv1, TF_FIRE_PERIODICALLY, this);
 }
 
 Machine::~Machine()
 {
 	EventLooper::GetInstance().CancelTimer(m_valuePolling);
+	EventLooper::GetInstance().CancelTimer(m_heartbeat);
 }
 
 void Machine::EventPolling()
@@ -69,12 +96,10 @@ void Machine::PushMainEvent(string name,Event* ev)
 {
 	if (!m_mainEvents.count(name))
 		m_mainEvents.insert (make_pair (name,ev));
-		//m_mainEvents.insert(make)
 }
 
 void Machine::PushStationsEvent(string name,Event* ev)
 {
-	//m_stationsEvents[name] = ev;
 	if (!m_stationsEvents.count(name))
 		m_stationsEvents.insert (make_pair (name,ev));
 }
@@ -82,22 +107,21 @@ void Machine::PushStationsEvent(string name,Event* ev)
 void Machine::OnTimer(TimerID tid)
 {
 	// TODO: event polling
-//	cout << "machine OnTimer " << tid << endl;
 	if (tid == m_valuePolling) {
-//		cout << "event pollint" << endl;
 		EventPolling();
+	} else if(tid == m_heartbeat) {
+		Heartbeat();
 	}
 }
+
+
 
 //=================================
 
 PlcMachine::PlcMachine()
 {
-	
 	ev_reciver& er = ev_reciver::GetInstance();
 	this->SetEvUpdater(er);
-
-	
 }
 
 PlcMachine::~PlcMachine()
@@ -105,7 +129,11 @@ PlcMachine::~PlcMachine()
 	
 }
 
+void PlcMachine::Heartbeat()
+{
+	PlcProxy* proxy = m_contex->GetProxy();
 
+}
 
 
 ////////////////////////////////////////////////////  Builder //////////////////////////////////////////////////////////////
@@ -307,7 +335,6 @@ LineStationDesiginProfile_t* GetLineStationDesiginProfile(std::string xmlFile);
 
 void MachineScheduler::FlashLineMachineList()
 {
-	cout << "======= : " << SysConfig::Instance().GetPluginLineDesignerXml() << endl;
 	LineStationDesiginProfile_t *ls = GetLineStationDesiginProfile(SysConfig::Instance().GetPluginLineDesignerXml());
 	
 	for (vector<LineSection_t*>::const_iterator iter_sec = ls->LineSections->begin();iter_sec != ls->LineSections->end();iter_sec++) {

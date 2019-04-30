@@ -60,6 +60,7 @@ public:
 	virtual int PlcConnect(MachineContex*) = 0;
 	virtual int PlcWriteWorlds(std::string,unsigned char* data,unsigned int) = 0;
 	virtual int PlcReadWorlds(std::string plcAddr,unsigned char* recvBuf,unsigned int recvLen) = 0;
+	virtual int PlcSendHeartbeat() = 0;
 
 protected:
 	virtual void OnTimer(TimerID tid){}
@@ -84,6 +85,7 @@ public:
 	virtual int PlcReadWorlds(std::string plcAddr,unsigned char* recvBuf,unsigned int recvLen);
 
 	virtual void OnTimer(TimerID tid);
+	virtual int PlcSendHeartbeat();
 };
 
 

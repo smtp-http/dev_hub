@@ -117,6 +117,11 @@ int FinsPlcProxy::PlcWriteWorlds(string dataAddr,unsigned char* data,unsigned in
 	return ret;
 }
 
+int FinsPlcProxy::PlcSendHeartbeat()
+{
+	
+}
+
 
 //( struct fins_sys_tp *sys, const char *start, unsigned char *data, size_t num_word );
 int FinsPlcProxy::PlcReadWorlds(string plcAddr,unsigned char* recvBuf,unsigned int recvLen)

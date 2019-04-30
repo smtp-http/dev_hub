@@ -62,9 +62,17 @@ int SysConfig::LoadConfig()
 				user->Update(root);
 		}
 		//cout << "************ " << root << endl;
-		uperComputerIp = root["UperComputerIp"].asString(); cout << uperComputerIp << endl;
-		uperComputerPort = root["UperComputerPort"].asInt();
-		pluginLineDesignerXml = root["PluginLineDesignerXml"].asString();
+		if(root["UperComputerIp"].isString())
+			uperComputerIp = root["UperComputerIp"].asString(); 
+
+		if(root["UperComputerPort"].isInt())
+			uperComputerPort = root["UperComputerPort"].asInt();
+
+		if(root["PluginLineDesignerXml"].isString())
+			pluginLineDesignerXml = root["PluginLineDesignerXml"].asString();
+		
+		if(root["PollingCycle"].isInt())
+			PollingCycle = root["PollingCycle"].asInt();
 		
 #if 0
 	//读取根节点信息

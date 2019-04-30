@@ -44,17 +44,21 @@ public:
 
 	virtual void OnTimer(TimerID tid);
 
+
+
 protected:
 	std::map<std::string,Event*> m_mainEvents;
 	std::map<std::string,Event*> m_stationsEvents;
 	std::map<std::string,LineStation_t*> m_stations;
 
 	void SetEvUpdater(IEventUpdater& eu){m_evUpdater = eu;}
+	virtual void Heartbeat() = 0;
 
-	PlcProxy* m_proxy;
+	//PlcProxy* m_proxy;
 	MachineContex* m_contex;
 
 	TimerID m_valuePolling;
+	TimerID m_heartbeat;
 	
 private:
 	std::string m_name;
@@ -67,7 +71,7 @@ class PlcMachine : public Machine
 public:
 	PlcMachine();
 	virtual ~PlcMachine();
-
+	virtual void Heartbeat();
 };
 
 

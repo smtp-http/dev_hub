@@ -34,6 +34,7 @@ void ev_reciver::UpdateEvent(std::string sectionName,std::string machineName,std
 
 //////////////////////////////////////// event ///////////////////////////////
 
+/*
 void Event::SniffingPlcEvent()
 {
 	unsigned char rd_buf[EV_DATA_BUFF_LEN];
@@ -49,11 +50,8 @@ void Event::SniffingPlcEvent()
 	unsigned int len = plcProxy->PlcReadWorlds(addr,rd_buf,m_plcDataSize);
 	for(int i = 0;i < m_plcDataSize;i ++) {
 		if(m_lastData[i] != rd_buf[i]) {
-			//cout << "+++ :" << m_machineContex << endl;
-			//cout << "section name:" << m_machineContex->SectionName() << "   machine name:" << m_machineContex->MachineName() << "  event name:" << m_eventName << "   rd_buf:" << rd_buf << "     plc data size:" << m_plcDataSize << endl;
 			string sectionName = m_machineContex->SectionName();
 			string machineName = m_machineContex->MachineName();
-			//cout << "--- this:" << this << "   ev uper:" << m_evUpdater << endl;
 			m_evUpdater.UpdateEvent(sectionName,machineName,m_eventName,rd_buf,m_plcDataSize);
 			break;
 		}
@@ -67,24 +65,123 @@ void Event::SendEapData(unsigned char* data)
 	string addr = m_flag + m_eapEventAddr;
 	plcProxy->PlcWriteWorlds(addr,data,m_eapDataSize);
 }
+*/
 
+//======================  Ev_Register ======================
 
-//======================  Ev_register ======================
-
-
-#if 0
-void Ev_Register::SendEapData(unsigned char *data)
+void Ev_Register::SendEapData(unsigned char* data)
 {
 
 }
+
+void Ev_Register::SniffingPlcEvent()
+{
+
+}
+
+
 
 //======================  Ev_EapCommand ======================
 
 
-
-void Ev_EapCommand::SendEapData(unsigned char *data)
+void Ev_EapCommand::SendEapData(unsigned char* data)
 {
 
 }
 
-#endif
+void Ev_EapCommand::SniffingPlcEvent()
+{
+	
+}
+
+
+//======================  Ev_HeareBeat ======================
+
+void Ev_HeareBeat::SendEapData(unsigned char* data)
+{
+
+}
+
+
+void Ev_HeareBeat::SniffingPlcEvent()
+{
+	
+}
+
+
+/******************  Ev_EventChangedFlag  *********************/
+void Ev_EventChangedFlag::SendEapData(unsigned char* data)
+{
+
+}
+
+
+void Ev_EventChangedFlag::SniffingPlcEvent()
+{
+	
+}
+
+
+/******************  Ev_BreakPoint  *********************/
+void Ev_BreakPoint::SendEapData(unsigned char* data)
+{
+
+}
+
+
+void Ev_BreakPoint::SniffingPlcEvent()
+{
+	
+}
+
+
+/******************  Ev_NoticeMessage  *********************/
+void Ev_NoticeMessage::SendEapData(unsigned char* data)
+{
+
+}
+
+
+void Ev_NoticeMessage::SniffingPlcEvent()
+{
+	
+}
+
+/******************  Ev_AlarmCode  *********************/
+void Ev_AlarmCode::SendEapData(unsigned char* data)
+{
+
+}
+
+
+void Ev_AlarmCode::SniffingPlcEvent()
+{
+	
+}
+
+/******************  Ev_MachineStatus  *********************/
+void Ev_MachineStatus::SendEapData(unsigned char* data)
+{
+
+}
+
+
+void Ev_MachineStatus::SniffingPlcEvent()
+{
+	
+}
+
+/******************  Ev_MachineYield  *********************/
+void Ev_MachineYield::SendEapData(unsigned char* data)
+{
+
+}
+
+
+void Ev_MachineYield::SniffingPlcEvent()
+{
+	
+}
+
+
+

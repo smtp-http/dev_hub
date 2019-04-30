@@ -25,6 +25,7 @@ public:
 	short GetUperComputerPort(){return uperComputerPort;}
 	std::string GetPlcProtocol(){return plcProtocol;}
 	std::string GetPluginLineDesignerXml(){return pluginLineDesignerXml;}
+	unsigned int GetPollingCycle(){return PollingCycle;}
 private:
 	SysConfig(){}
 	std::list<IConfigUser *> m_users;
@@ -33,6 +34,7 @@ private:
 	short uperComputerPort;
 	std::string plcProtocol;
 	std::string pluginLineDesignerXml;
+	unsigned int PollingCycle;     //ms
 };
 
 
