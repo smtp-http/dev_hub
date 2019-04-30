@@ -455,9 +455,9 @@ vector<LineSection_t*> *GetLineSectionList(TiXmlNode *lineSectionNode)
 					printf("ReadOnly text error: %s\n", lineSectionPropertyNode->ToElement()->GetText());
 				}
 			}
-
-			sectionList->push_back(section);
 		}
+
+		sectionList->push_back(section);
 	}
 
 	return sectionList;
