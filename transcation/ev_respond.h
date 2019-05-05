@@ -285,7 +285,7 @@ class Ev_EventChangedFlag : public Event
 public:
 	Ev_EventChangedFlag(struct EvPara* ev_para)
 	{
-		m_direction = 0; // EAP-->PLC
+		m_direction = 1; // PLC-->EAP
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_EventChangedFlag(){}
@@ -319,7 +319,7 @@ class Ev_BreakPoint : public Event
 public:
 	Ev_BreakPoint(struct EvPara* ev_para)
 	{
-		m_direction = 0; // EAP-->PLC
+		m_direction = 1; // PLC-->EAP
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_BreakPoint(){}
@@ -334,7 +334,7 @@ class Ev_AlarmCode : public Event
 public:
 	Ev_AlarmCode(struct EvPara* ev_para)
 	{
-		m_direction = 0; // EAP-->PLC
+		m_direction = 1; // PLC-->EAP
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_AlarmCode(){}
@@ -348,7 +348,7 @@ class Ev_MachineStatus : public Event
 public:
 	Ev_MachineStatus(struct EvPara* ev_para)
 	{
-		m_direction = 0; // EAP-->PLC
+		m_direction = 1; // PLC-->EAP
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_MachineStatus(){}
@@ -362,7 +362,7 @@ class Ev_MachineYield : public Event
 public:
 	Ev_MachineYield(struct EvPara* ev_para)
 	{
-		m_direction = 0; // EAP-->PLC
+		m_direction = 1; // PLC-->EAP
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_MachineYield(){}
