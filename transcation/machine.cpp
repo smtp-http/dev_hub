@@ -44,7 +44,6 @@ Event* BuildEvent(string action,struct EvPara* ev_para)
 }
 
 
-
 //////////////////////////////////////////////////////// Machine //////////////////////////////////////////////////////////
 Machine::Machine()
 	: m_evUpdater(ev_reciver::GetInstance())
@@ -114,11 +113,17 @@ void Machine::OnTimer(TimerID tid)
 	if (tid == m_valuePolling) {
 		EventPolling();
 	} else if(tid == m_heartbeat) {
+		//cout << "heart beat......" << endl;
 		Event *ev_hb = m_mainEvents["HeartBeat"];
 		if(ev_hb == NULL)
 			return;
-
-		//ev_hb->
+		struct Fream_HeartBeat_eap hb_eap = {
+			.SequenceID = ev_hb->GetNextSequenceId(),
+			.ResultCode = RESULT_Pass,
+			.TimeTicks = GetTime()
+		};
+		cout << hb_eap.SequenceID << endl;
+		ev_hb->SendEapData((unsigned char*)(&hb_eap));
 	}
 }
 

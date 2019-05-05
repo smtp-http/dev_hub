@@ -1,9 +1,16 @@
 
 #include "ev_respond.h"
 #include "config.h"
-
+#include <time.h>
 using namespace std;
 
+
+unsigned long GetTime()
+{
+	time_t now;
+	time(&now);
+	return (unsigned long)now;
+}
 
 ///////////////////////////////// ev_reciver ////////////////////////////
 
@@ -61,9 +68,7 @@ void Event::SniffingPlcEvent()
 
 void Event::SendEapData(unsigned char* data)
 {
-	PlcProxy* plcProxy = m_machineContex->GetProxy();
-	string addr = m_flag + m_eapEventAddr;
-	plcProxy->PlcWriteWorlds(addr,data,m_eapDataSize);
+	
 }
 */
 
@@ -99,13 +104,40 @@ void Ev_EapCommand::SniffingPlcEvent()
 
 void Ev_HeareBeat::SendEapData(unsigned char* data)
 {
-
+	PlcProxy* plcProxy = m_machineContex->GetProxy();
+	string addr = m_flag + m_eapEventAddr;
+	plcProxy->PlcWriteWorlds(addr,data,m_eapDataSize);
 }
 
 
 void Ev_HeareBeat::SniffingPlcEvent()
 {
+	unsigned char rd_buf[EV_DATA_BUFF_LEN];
+	string addr = m_flag + m_plcEventAddr;
+
+	PlcProxy* plcProxy = m_machineContex->GetProxy();//&PlcProxy::Instance();
 	
+	if (m_machineContex == NULL) {
+		printf("m_machineContex is NULL!  return.\n" );
+		return;
+	}
+
+	unsigned int len = plcProxy->PlcReadWorlds(addr,rd_buf,m_plcDataSize);
+	struct Fream_HeartBeat_plc* hb_plc = (struct Fream_HeartBeat_plc*)rd_buf;
+	if(m_sequenceID == hb_plc->SequenceID)
+		cout << hb_plc->SequenceID << endl;
+	#if 0
+	for(int i = 0;i < m_plcDataSize;i ++) {
+
+		if(m_lastData[i] != rd_buf[i]) {
+			string sectionName = m_machineContex->SectionName();
+			string machineName = m_machineContex->MachineName();
+
+			m_evUpdater.UpdateEvent(sectionName,machineName,m_eventName,rd_buf,m_plcDataSize);
+			break;
+		}
+	}
+	#endif
 }
 
 
