@@ -52,8 +52,7 @@ protected:
 	std::map<std::string,LineStation_t*> m_stations;
 
 	void SetEvUpdater(IEventUpdater& eu){m_evUpdater = eu;}
-	virtual void Heartbeat() = 0;
-
+	
 	//PlcProxy* m_proxy;
 	MachineContex* m_contex;
 
@@ -71,7 +70,7 @@ class PlcMachine : public Machine
 public:
 	PlcMachine();
 	virtual ~PlcMachine();
-	virtual void Heartbeat();
+	
 };
 
 
@@ -80,7 +79,7 @@ class Builder
 public:
 	virtual void BuildMachine(std::string sectionName,LineMachine_t*) = 0;
 	virtual void BuildMainDeviceProfile(MainDeviceProfile_t *) = 0;
-	virtual void BuildCustomEvents(vector<StationEventProfile_t*>*) = 0;
+	virtual void BuildCustomEvents(vector<LineStation_t*>*) = 0;
 	virtual Machine* GetMachine()=0;
 	virtual void SetMachine(Machine *) = 0;
 protected:
@@ -95,7 +94,7 @@ public:
 
 	virtual void BuildMachine(std::string sectionName,LineMachine_t*);
 	virtual void BuildMainDeviceProfile(MainDeviceProfile_t *);
-	virtual void BuildCustomEvents(vector<StationEventProfile_t*>*);
+	virtual void BuildCustomEvents(vector<LineStation_t*>*);
 
 	virtual Machine* GetMachine(){return m_machine;}
 	virtual void SetMachine(Machine *m){m_machine = m;}

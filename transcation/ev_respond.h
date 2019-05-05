@@ -111,13 +111,13 @@ struct Fream_AlarmCode_plc {
 struct Fream_MachineStatus_eap {
 	unsigned short SequenceID;
 	unsigned short EventCode;
-	unsigned short Content;
+	unsigned short MachineStateCode;
 }__attribute__((__packed__));
 
 struct Fream_MachineStatus_plc {
 	unsigned short SequenceID;
 	unsigned short ResultCode;
-	unsigned short Content;
+	unsigned short ResultValue;
 }__attribute__((__packed__));
 
 
@@ -138,6 +138,33 @@ struct Fream_MachineYield_plc {
 }__attribute__((__packed__));
 
 
+/******************  CheckIn  *********************/
+struct Fream_CheckIn_eap {
+	unsigned short SequenceID;
+	unsigned short EventCode;
+	unsigned char SerialNumber[30];
+}__attribute__((__packed__));
+
+struct Fream_CheckIn_plc {
+	unsigned short SequenceID;
+	unsigned short ResultCode;
+	unsigned int ResultValue;
+}__attribute__((__packed__));
+
+
+/******************  PostResult  *********************/
+struct Fream_PostResult_eap {
+	unsigned short SequenceID;
+	unsigned short EventCode;
+	unsigned int ResultCode;
+	unsigned char SerialNumber[30];
+}__attribute__((__packed__));
+
+struct Fream_PostResult_plc {
+	unsigned short SequenceID;
+	unsigned short ResultCode;
+	unsigned int ResultValue;
+}__attribute__((__packed__));
 
 ////////////////////////////////////////////  EVENT ////////////////////////////////////////////////////
 
@@ -371,6 +398,34 @@ public:
 };
 
 
+/******************  Ev_CheckIn  *********************/
+class Ev_CheckIn : public Event
+{
+public:
+	Ev_CheckIn(struct EvPara* ev_para)
+	{
+		m_direction = 1; // PLC-->EAP
+		EV_PARAM_INIT(ev_para)
+	}
+	virtual ~Ev_CheckIn(){}
+	virtual void SendEapData(unsigned char* data);
+	virtual void SniffingPlcEvent();
+};
+
+
+/******************  Ev_PostResult  *********************/
+class Ev_PostResult : public Event
+{
+public:
+	Ev_PostResult(struct EvPara* ev_para)
+	{
+		m_direction = 1; // PLC-->EAP
+		EV_PARAM_INIT(ev_para)
+	}
+	virtual ~Ev_PostResult(){}
+	virtual void SendEapData(unsigned char* data);
+	virtual void SniffingPlcEvent();
+};
 
 
 #endif

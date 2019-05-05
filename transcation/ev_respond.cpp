@@ -184,4 +184,31 @@ void Ev_MachineYield::SniffingPlcEvent()
 }
 
 
+/******************  Ev_CheckIn  *********************/
+
+void Ev_CheckIn::SendEapData(unsigned char* data)
+{
+
+}
+
+
+void Ev_CheckIn::SniffingPlcEvent()
+{
+	
+}
+
+
+/******************  Ev_PostResult  *********************/
+
+void Ev_PostResult::SendEapData(unsigned char* data)
+{
+
+}
+
+
+void Ev_PostResult::SniffingPlcEvent()
+{
+	
+}
+
 

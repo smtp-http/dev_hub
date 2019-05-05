@@ -32,6 +32,10 @@ Event* BuildEvent(string action,struct EvPara* ev_para)
 		ev = new Ev_MachineYield(ev_para);
 	else if (ev_para->eventAction == "BreakPoint")
 		ev = new Ev_BreakPoint(ev_para);
+	else if (ev_para->eventAction == "CheckIn")
+		ev = new Ev_CheckIn(ev_para);
+	else if (ev_para->eventAction == "PostResult")
+		ev = new Ev_PostResult(ev_para);
 	else
 		printf("%s:%d  Event action name is not exist!\n",__FILE__,__LINE__);
 
@@ -110,7 +114,11 @@ void Machine::OnTimer(TimerID tid)
 	if (tid == m_valuePolling) {
 		EventPolling();
 	} else if(tid == m_heartbeat) {
-		Heartbeat();
+		Event *ev_hb = m_mainEvents["HeartBeat"];
+		if(ev_hb == NULL)
+			return;
+
+		//ev_hb->
 	}
 }
 
@@ -129,11 +137,6 @@ PlcMachine::~PlcMachine()
 	
 }
 
-void PlcMachine::Heartbeat()
-{
-	PlcProxy* proxy = m_contex->GetProxy();
-
-}
 
 
 ////////////////////////////////////////////////////  Builder //////////////////////////////////////////////////////////////
@@ -169,7 +172,6 @@ void MachinePlcBuilder::BuildMainDeviceProfile(MainDeviceProfile_t *mainDevPro)
 	}
 
 	
-
 	for (vector<StationEventProfile_t*>::const_iterator iter = mainDevPro->mainEvents.begin();iter != mainDevPro->mainEvents.end();iter++) {
 		StationEventProfile_t* sep = *iter;
 
@@ -205,40 +207,49 @@ void MachinePlcBuilder::BuildMainDeviceProfile(MainDeviceProfile_t *mainDevPro)
 						sep->EapBlockAddress,sep->EapBlockSize,sep->Flag
 
 
-void MachinePlcBuilder::BuildCustomEvents(vector<StationEventProfile_t*>* mainEvList)
+void MachinePlcBuilder::BuildCustomEvents(vector<LineStation_t*>* stations)
 {
 	if (m_machine == NULL){
 		printf("%s:%d  m_machine is null!\n",__FILE__,__LINE__);
 		return;
 	}
 
-	for (vector<StationEventProfile_t*>::const_iterator iter = mainEvList->begin();iter != mainEvList->end();iter++) {
-		StationEventProfile_t* sep = *iter;
-
-		Event* ev = NULL;
-		struct EvPara ev_para = 
-		{
-			.eventName = sep->Name,
-			.eventAction = sep->Action,
-			.plcEventAddr = sep->PlcBlockAddress,
-			.plcDataSize = sep->PlcBlockSize,
-			.eapEventAddr = sep->EapBlockAddress,
-			.eapDataSize = sep->EapBlockSize,
-			.flag = sep->Flag
-		};
-
-		cout << "build custom:  ";
-		ev = BuildEvent(sep->Action,&ev_para);
-		if (ev == NULL){
-			printf("%s:%d  BuildEvent  null!\n",__FILE__,__LINE__);
-			continue;
-		}
-
-		ev->SetMachineContex(m_machine->GetMachineContex());
-
-		m_machine->PushStationsEvent(ev_para.eventName,ev);
+	if (stations == NULL){
+		printf("%s:%d  m_stations is null!\n",__FILE__,__LINE__);
+		return;
 	}
 
+	for (vector<LineStation_t*>::const_iterator iter = stations->begin();iter != stations->end();iter++) {
+		LineStation_t* station = *iter;
+		vector<StationEventProfile_t*>* stationsEvents = &station->Events;
+
+		for (vector<StationEventProfile_t*>::const_iterator iter = stationsEvents->begin();iter != stationsEvents->end();iter++) {
+			StationEventProfile_t* sep = *iter;
+
+			Event* ev = NULL;
+			struct EvPara ev_para = 
+			{
+				.eventName = sep->Name,
+				.eventAction = sep->Action,
+				.plcEventAddr = sep->PlcBlockAddress,
+				.plcDataSize = sep->PlcBlockSize,
+				.eapEventAddr = sep->EapBlockAddress,
+				.eapDataSize = sep->EapBlockSize,
+				.flag = sep->Flag
+			};
+
+			cout << "build custom:  ";
+			ev = BuildEvent(sep->Action,&ev_para);
+			if (ev == NULL){
+				printf("%s:%d  BuildEvent  null!\n",__FILE__,__LINE__);
+				continue;
+			}
+
+			ev->SetMachineContex(m_machine->GetMachineContex());
+
+			m_machine->PushStationsEvent(ev_para.eventName,ev);
+		}
+	}
 }
 
 //////////////////////////////////////////////////// Director //////////////////////////////////////////////////////////////
@@ -263,7 +274,7 @@ void Director::ConstructMachine(string sectionName,LineMachine_t* lineMachine)
 
 	m_builder->BuildMachine(sectionName,lineMachine);
 	
-	m_builder->BuildCustomEvents(lineMachine->p_mainEvents);
+	m_builder->BuildCustomEvents(&lineMachine->Stations);
 	m_builder->BuildMainDeviceProfile(&lineMachine->mainDeviceProfile);
 
 	Machine* mc = m_builder->GetMachine();
