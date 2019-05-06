@@ -44,6 +44,22 @@ Event* BuildEvent(string action,struct EvPara* ev_para)
 }
 
 
+void SplitString(const std::string& s, std::vector<std::string>& v, const std::string& c)
+{
+	std::string::size_type pos1, pos2;
+	pos2 = s.find(c);
+	pos1 = 0;
+
+	while(std::string::npos != pos2){
+		v.push_back(s.substr(pos1, pos2-pos1));
+		pos1 = pos2 + c.size();
+		pos2 = s.find(c, pos1);
+	}
+
+	if(pos1 != s.length())
+		v.push_back(s.substr(pos1));
+}
+
 //////////////////////////////////////////////////////// Machine //////////////////////////////////////////////////////////
 Machine::Machine()
 	: m_evUpdater(ev_reciver::GetInstance())
@@ -122,7 +138,7 @@ void Machine::OnTimer(TimerID tid)
 			.ResultCode = RESULT_Pass,
 			.TimeTicks = GetTime()
 		};
-		cout << "++ send heart beat: " << hb_eap.SequenceID << endl;
+		//cout << "++ send heart beat: " << hb_eap.SequenceID << endl;
 		ev_hb->SendEapData((unsigned char*)(&hb_eap));
 	}
 }
@@ -159,6 +175,26 @@ void MachinePlcBuilder::BuildMachine(string sectionName,LineMachine_t* lineMachi
 	MachineContex* contex = new PlcContex("Fins",sectionName,lineMachine->Name,mainDevPro->IpAddress,mainDevPro->Port);
 	m_machine->SetMachineContex(contex);
 
+	std::vector<std::string> DataFormats;
+
+	SplitString(mainDevPro->DataFormat,DataFormats," ");
+
+	for(vector<string>::const_iterator iter = DataFormats.begin();iter != DataFormats.end();iter++){
+		if(!strcmp(iter->c_str(),"Default")){
+			printf("+++++++++++ default\n");
+			break;
+		} else if (!strcmp(iter->c_str(),"ReadSkipZero")){
+			contex->ReadSkipZero = true;
+		} else if (!strcmp(iter->c_str(),"WordSwap")){
+			contex->WordSwap = true;
+		}  else if (!strcmp(iter->c_str(),"IntSwap")){
+			contex->IntSwap = true;
+		} else if (!strcmp(iter->c_str(),"LongSwap")){
+			contex->LongSwap = true;
+		}
+	}
+
+	//contex->
 	// connect to plc
 	PlcProxy* proxy = contex->GetProxy();
 	if (proxy == NULL){

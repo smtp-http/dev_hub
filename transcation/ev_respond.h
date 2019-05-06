@@ -423,7 +423,7 @@ public:
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_AlarmCode(){}
-	virtual void SendEapData(unsigned char* data);
+	
 	virtual void SniffingPlcEvent();
 };
 
@@ -437,7 +437,7 @@ public:
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_MachineStatus(){}
-	virtual void SendEapData(unsigned char* data);
+	
 	virtual void SniffingPlcEvent();
 };
 
@@ -451,7 +451,7 @@ public:
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_MachineYield(){}
-	virtual void SendEapData(unsigned char* data);
+	
 	virtual void SniffingPlcEvent();
 };
 

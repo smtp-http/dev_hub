@@ -15,12 +15,27 @@ class PlcProxy;
 class MachineContex
 {
 public:
-	MachineContex(){}
+	MachineContex()
+		: WordSwap(false)
+		, IntSwap(false)
+		, LongSwap(false)
+		, ReadSkipZero(false)
+	{
+
+	}
 	virtual ~MachineContex(){}
 
 	//void SetConnectionContex(void *contex){m_connectionContex = contex;}  // for example: struct fins_sys_tp *m_sys;
-	std::string SectionName(){return m_sectionName;}
-	std::string MachineName(){return m_machineName;}
+	std::string SectionName()
+	{
+		return m_sectionName;
+	}
+	std::string MachineName()
+	{
+		return m_machineName;
+	}
+
+	
 
 	PlcProxy* GetProxy(){return m_proxy;}
 
@@ -28,12 +43,18 @@ public:
 	std::string m_ip;
 	unsigned int m_port;
 
+	bool ReadSkipZero;
+	bool WordSwap;
+	bool IntSwap;
+	bool LongSwap;
+
 protected:
 	PlcProxy* m_proxy;
 	std::string m_protocolType;
 
 	std::string m_sectionName;
 	std::string m_machineName;
+
 };
 
 

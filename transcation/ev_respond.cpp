@@ -5,6 +5,38 @@
 using namespace std;
 
 
+unsigned short BLEndianUshort(unsigned short value,bool enable)
+{
+	if(enable)
+    	return ((value & 0x00FF) << 8 ) | ((value & 0xFF00) >> 8);
+    else 
+    	return value;
+}
+
+
+unsigned int BLEndianUint32(unsigned int value) 
+{ 
+	return ((value & 0x000000FF) << 24) | ((value & 0x0000FF00) << 8) | ((value & 0x00FF0000) >> 8) | ((value & 0xFF000000) >> 24); 
+}
+
+unsigned int BLEndianIntSwap(unsigned int value,bool enable) 
+{ 
+	if(enable)
+		return ((value & 0x000000FF) << 8) | ((value & 0x0000FF00) >> 8) | ((value & 0x00FF0000) << 8) | ((value & 0xFF000000) >> 8); 
+	else
+		return value;
+}
+
+unsigned long long BLEndianLongSwap(unsigned long long value,bool enable) 
+{ 
+	if(enable)
+		return ((value & 0x00000000000000FF) << 8) | ((value & 0x000000000000FF00) >> 8) | ((value & 0x0000000000FF0000) << 8) | ((value & 0x00000000FF000000) >> 8) | \
+				((value & 0x000000FF00000000) << 8) | ((value & 0x0000FF0000000000) >> 8) | ((value & 0x00FF000000000000) << 8) | ((value & 0xFF00000000000000) >> 8); 
+	else
+		return value;
+}
+
+
 unsigned long GetTime()
 {
 	time_t now;
@@ -164,11 +196,6 @@ void Ev_NoticeMessage::SniffingPlcEvent()
 }
 
 /******************  Ev_AlarmCode  *********************/
-void Ev_AlarmCode::SendEapData(unsigned char* data)
-{
-
-}
-
 
 void Ev_AlarmCode::SniffingPlcEvent()
 {
@@ -179,27 +206,34 @@ void Ev_AlarmCode::SniffingPlcEvent()
 		printf("%s:%d  Ev_AlarmCode return error!\n",__FILE__,__LINE__);
 		return;
 	}
-	printf("  alarm: ");
-	for(int i = 0; i < m_plcDataSize; i++) {
-		printf("%x ",rd_buf[i]);
-	}
-
-	printf("\n");
+	
 
 	struct Fream_AlarmCode_plc* ac_plc = (struct Fream_AlarmCode_plc*)rd_buf;
-	/*if(m_sequenceID == ac_plc->SequenceID){
-		m_sequenceID = ac_plc->SequenceID;
-		cout << "---- s id: " << ac_plc->SequenceID << endl;
+	if(m_sequenceID != BLEndianUshort(ac_plc->SequenceID,m_machineContex->WordSwap)){
+		
+		printf("  alarm: ");
+		for(int i = 0; i < m_plcDataSize; i++) {
+			printf("%x ",rd_buf[i]);
+		}
+
+		printf("\n");
+
+		m_sequenceID = BLEndianUshort(ac_plc->SequenceID,m_machineContex->WordSwap);
+		cout << "---- s id: " << m_sequenceID << endl;
 		cout << "  Content: " << ac_plc->Content<<endl;
 		cout << "  ev_code: " << ac_plc->EventCode << endl;
-	}*/
+
+		struct Fream_AlarmCode_eap ac = {
+			.SequenceID = m_sequenceID,
+			.ResultCode = RESULT_Pass,
+			.ResultValue = 0
+		};
+
+		SendEapData((unsigned char*)&ac);
+	}
 }
 
 /******************  Ev_MachineStatus  *********************/
-void Ev_MachineStatus::SendEapData(unsigned char* data)
-{
-
-}
 
 
 void Ev_MachineStatus::SniffingPlcEvent()
@@ -212,32 +246,73 @@ void Ev_MachineStatus::SniffingPlcEvent()
 		return;
 	}
 
-	printf(" status: ");
-	for(int i = 0; i < m_plcDataSize; i++) {
-		printf("%x ",rd_buf[i]);
-	}
-
-	printf("\n");
 
 	struct Fream_MachineStatus_plc* ms_plc = (struct Fream_MachineStatus_plc*)rd_buf;
-	/*if(m_sequenceID == ms_plc->SequenceID){
-		m_sequenceID = ms_plc->SequenceID;
-		cout << "---- s id: " << ms_plc->SequenceID << endl;
+	if(m_sequenceID != BLEndianUshort(ms_plc->SequenceID,m_machineContex->WordSwap)){
+
+		printf(" status: ");
+		for(int i = 0; i < m_plcDataSize; i++) {
+			printf("%x ",rd_buf[i]);
+		}
+
+		printf("\n");
+
+		m_sequenceID = BLEndianUshort(ms_plc->SequenceID,m_machineContex->WordSwap);
+		cout << "---- s id: " << m_sequenceID << endl;
 		cout << "StateCode: " << ms_plc->MachineStateCode<<endl;
 		cout << "  ev_code: " << ms_plc->EventCode << endl;
-	}*/
+
+		struct Fream_MachineStatus_eap ms = {
+			.SequenceID = m_sequenceID,
+			.ResultCode = RESULT_Pass,
+			.ResultValue = 0
+		};
+
+		SendEapData((unsigned char*)&ms);
+	}
 }
 
 /******************  Ev_MachineYield  *********************/
-void Ev_MachineYield::SendEapData(unsigned char* data)
-{
-
-}
-
 
 void Ev_MachineYield::SniffingPlcEvent()
 {
-	
+	unsigned char rd_buf[EV_DATA_BUFF_LEN];
+
+	int ret = ReadData(rd_buf);
+	if(ret != 0){
+		printf("%s:%d  Ev_MachineStatus return error!\n",__FILE__,__LINE__);
+		return;
+	}
+
+
+	struct Fream_MachineYield_plc* my_plc = (struct Fream_MachineYield_plc*)rd_buf;
+	if(m_sequenceID != BLEndianUshort(my_plc->SequenceID,m_machineContex->WordSwap)){
+
+		printf(" status: ");
+		for(int i = 0; i < m_plcDataSize; i++) {
+			printf("%x ",rd_buf[i]);
+		}
+
+		printf("\n");
+
+		m_sequenceID = BLEndianUshort(my_plc->SequenceID,m_machineContex->WordSwap);
+		cout << "---- s id: " << m_sequenceID << endl;
+		cout << "  ev_code: " << BLEndianUshort(my_plc->EventCode,m_machineContex->WordSwap) << endl;
+		cout << "    Input: " << BLEndianIntSwap(my_plc->Input,m_machineContex->IntSwap) << endl;
+		cout << "   Output: " << BLEndianIntSwap(my_plc->Output,m_machineContex->IntSwap) << endl;
+		cout << "    Yield: " << BLEndianUshort(my_plc->Yield,m_machineContex->WordSwap) << endl;
+		cout << "      Oee: " << BLEndianUshort(my_plc->Oee,m_machineContex->WordSwap) << endl;
+
+		
+
+		struct Fream_MachineYield_eap my = {
+			.SequenceID = m_sequenceID,
+			.ResultCode = RESULT_Pass,
+			.ResultValue = 0
+		};
+
+		SendEapData((unsigned char*)&my);
+	}
 }
 
 

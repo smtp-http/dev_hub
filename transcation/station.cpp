@@ -323,6 +323,9 @@ vector<LineMachine_t*> *GetLineMachineList(TiXmlNode *MachineNode)
 									}
 								}
 							}
+						} else if(!strcmp(MainDeviceProfileNode->Value(),"DataFormat")){
+							machine->mainDeviceProfile.DataFormat = MainDeviceProfileNode->ToElement()->GetText();
+							cout << "+++++++ DataFormat:" << machine->mainDeviceProfile.DataFormat << endl;
 						}
 					}
 				} else if(!strcmp(LineMachineNode->Value(),"CarrierSlotCount")) {
