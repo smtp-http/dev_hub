@@ -62,6 +62,11 @@ public:
 	virtual int PlcReadWorlds(std::string plcAddr,unsigned char* recvBuf,unsigned int recvLen) = 0;
 	virtual int PlcSendHeartbeat() = 0;
 
+	int GetConnectionStatus()
+	{
+		return m_connectionStatus;
+	}
+
 protected:
 	virtual void OnTimer(TimerID tid){}
 

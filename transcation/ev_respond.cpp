@@ -41,36 +41,38 @@ void ev_reciver::UpdateEvent(std::string sectionName,std::string machineName,std
 
 //////////////////////////////////////// event ///////////////////////////////
 
-/*
-void Event::SniffingPlcEvent()
+
+int Event::ReadData(unsigned char *rd_buf)
 {
-	unsigned char rd_buf[EV_DATA_BUFF_LEN];
 	string addr = m_flag + m_plcEventAddr;
 
 	PlcProxy* plcProxy = m_machineContex->GetProxy();//&PlcProxy::Instance();
 	
 	if (m_machineContex == NULL) {
 		printf("m_machineContex is NULL!  return.\n" );
-		return;
+		return -1;
 	}
 
-	unsigned int len = plcProxy->PlcReadWorlds(addr,rd_buf,m_plcDataSize);
-	for(int i = 0;i < m_plcDataSize;i ++) {
-		if(m_lastData[i] != rd_buf[i]) {
-			string sectionName = m_machineContex->SectionName();
-			string machineName = m_machineContex->MachineName();
-			m_evUpdater.UpdateEvent(sectionName,machineName,m_eventName,rd_buf,m_plcDataSize);
-			break;
-		}
-	}
+	if(plcProxy->GetConnectionStatus() == CONNECT_NO)
+		return -2;
+
+	return plcProxy->PlcReadWorlds(addr,rd_buf,m_plcDataSize);
 }
 
 
 void Event::SendEapData(unsigned char* data)
 {
-	
+	PlcProxy* plcProxy = m_machineContex->GetProxy();
+
+	if(plcProxy->GetConnectionStatus() == CONNECT_NO){
+		return;
+	}
+
+
+	string addr = m_flag + m_eapEventAddr;
+	plcProxy->PlcWriteWorlds(addr,data,m_eapDataSize);
 }
-*/
+
 
 //======================  Ev_Register ======================
 
@@ -102,42 +104,24 @@ void Ev_EapCommand::SniffingPlcEvent()
 
 //======================  Ev_HeareBeat ======================
 
-void Ev_HeareBeat::SendEapData(unsigned char* data)
-{
-	PlcProxy* plcProxy = m_machineContex->GetProxy();
-	string addr = m_flag + m_eapEventAddr;
-	plcProxy->PlcWriteWorlds(addr,data,m_eapDataSize);
-}
-
 
 void Ev_HeareBeat::SniffingPlcEvent()
 {
 	unsigned char rd_buf[EV_DATA_BUFF_LEN];
-	string addr = m_flag + m_plcEventAddr;
-
-	PlcProxy* plcProxy = m_machineContex->GetProxy();//&PlcProxy::Instance();
 	
-	if (m_machineContex == NULL) {
-		printf("m_machineContex is NULL!  return.\n" );
+	int ret = ReadData(rd_buf);
+	
+	if(ret != 0){
+		printf("%s:%d  Ev_HeareBeat return error!\n",__FILE__,__LINE__);
 		return;
 	}
 
-	unsigned int len = plcProxy->PlcReadWorlds(addr,rd_buf,m_plcDataSize);
 	struct Fream_HeartBeat_plc* hb_plc = (struct Fream_HeartBeat_plc*)rd_buf;
-	if(m_sequenceID == hb_plc->SequenceID)
-		cout << hb_plc->SequenceID << endl;
-	#if 0
-	for(int i = 0;i < m_plcDataSize;i ++) {
-
-		if(m_lastData[i] != rd_buf[i]) {
-			string sectionName = m_machineContex->SectionName();
-			string machineName = m_machineContex->MachineName();
-
-			m_evUpdater.UpdateEvent(sectionName,machineName,m_eventName,rd_buf,m_plcDataSize);
-			break;
-		}
-	}
-	#endif
+	/*if(m_sequenceID == hb_plc->SequenceID){
+		cout << "--- s id:"<< hb_plc->SequenceID << endl;
+		cout << "    time:" << hb_plc->TimeTicks<<endl;
+		cout << " ev_code:" << hb_plc->EventCode << endl;
+	}*/
 }
 
 
@@ -188,7 +172,27 @@ void Ev_AlarmCode::SendEapData(unsigned char* data)
 
 void Ev_AlarmCode::SniffingPlcEvent()
 {
+	unsigned char rd_buf[EV_DATA_BUFF_LEN];
 	
+	int ret = ReadData(rd_buf);
+	if(ret != 0){
+		printf("%s:%d  Ev_AlarmCode return error!\n",__FILE__,__LINE__);
+		return;
+	}
+	printf("  alarm: ");
+	for(int i = 0; i < m_plcDataSize; i++) {
+		printf("%x ",rd_buf[i]);
+	}
+
+	printf("\n");
+
+	struct Fream_AlarmCode_plc* ac_plc = (struct Fream_AlarmCode_plc*)rd_buf;
+	/*if(m_sequenceID == ac_plc->SequenceID){
+		m_sequenceID = ac_plc->SequenceID;
+		cout << "---- s id: " << ac_plc->SequenceID << endl;
+		cout << "  Content: " << ac_plc->Content<<endl;
+		cout << "  ev_code: " << ac_plc->EventCode << endl;
+	}*/
 }
 
 /******************  Ev_MachineStatus  *********************/
@@ -200,7 +204,28 @@ void Ev_MachineStatus::SendEapData(unsigned char* data)
 
 void Ev_MachineStatus::SniffingPlcEvent()
 {
-	
+	unsigned char rd_buf[EV_DATA_BUFF_LEN];
+
+	int ret = ReadData(rd_buf);
+	if(ret != 0){
+		printf("%s:%d  Ev_MachineStatus return error!\n",__FILE__,__LINE__);
+		return;
+	}
+
+	printf(" status: ");
+	for(int i = 0; i < m_plcDataSize; i++) {
+		printf("%x ",rd_buf[i]);
+	}
+
+	printf("\n");
+
+	struct Fream_MachineStatus_plc* ms_plc = (struct Fream_MachineStatus_plc*)rd_buf;
+	/*if(m_sequenceID == ms_plc->SequenceID){
+		m_sequenceID = ms_plc->SequenceID;
+		cout << "---- s id: " << ms_plc->SequenceID << endl;
+		cout << "StateCode: " << ms_plc->MachineStateCode<<endl;
+		cout << "  ev_code: " << ms_plc->EventCode << endl;
+	}*/
 }
 
 /******************  Ev_MachineYield  *********************/

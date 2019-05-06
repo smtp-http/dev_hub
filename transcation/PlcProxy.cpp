@@ -68,6 +68,7 @@ void FinsPlcProxy::OnTimer(TimerID tid)
 
 void FinsPlcProxy::on_disconnect(MachineContex* mc)
 {
+	cout << "******************* on disconnect" << endl; 
 	finslib_disconnect((struct fins_sys_tp*)m_plcConnectHandle);
 	m_plcConnectHandle = NULL;
 	m_connectionStatus = CONNECT_NO;
@@ -113,6 +114,12 @@ int FinsPlcProxy::PlcWriteWorlds(string dataAddr,unsigned char* data,unsigned in
 {
 	int ret;
 	ret = finslib_memory_area_write_word((struct fins_sys_tp*)m_plcConnectHandle,dataAddr.c_str(),data,len);
+	
+	if(ret != FINS_RETVAL_SUCCESS) {
+		printf("%s:%d  FINS Write words error! ret: %d\n",__FILE__,__LINE__,ret);
+		on_disconnect(m_contex);
+		return -1;
+	} 
 
 	return ret;
 }
@@ -126,7 +133,18 @@ int FinsPlcProxy::PlcSendHeartbeat()
 //( struct fins_sys_tp *sys, const char *start, unsigned char *data, size_t num_word );
 int FinsPlcProxy::PlcReadWorlds(string plcAddr,unsigned char* recvBuf,unsigned int recvLen)
 {
-	return finslib_memory_area_read_word((struct fins_sys_tp*)m_plcConnectHandle,plcAddr.c_str(),recvBuf,recvLen);
+	recvLen = recvLen / 2;
+	//cout << "+++ " << plcAddr << "  " << recvLen << endl;
+
+	int ret = finslib_memory_area_read_word((struct fins_sys_tp*)m_plcConnectHandle,plcAddr.c_str(),recvBuf,recvLen);
+
+	if(ret != FINS_RETVAL_SUCCESS) {
+		printf("%s:%d  FINS Read words error! ret: %d\n",__FILE__,__LINE__,ret);
+		on_disconnect(m_contex);
+		return -1;
+	} 
+
+	return 0;
 }
 
 

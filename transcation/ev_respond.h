@@ -264,22 +264,21 @@ public:
 	Event()
 		: m_evUpdater(ev_reciver::GetInstance())
 		, m_machineContex(NULL)
-		, m_sequenceID(0)
+		, m_sequenceID(-1)
 	{
-		memset(m_lastData,0,EV_DATA_BUFF_LEN);
+
 	}
 
 	Event(struct EvPara* ev_para)
 		: m_evUpdater(ev_reciver::GetInstance())
 	{
-		memset(m_lastData,0,EV_DATA_BUFF_LEN);
 		EV_PARAM_INIT(ev_para)
 	}
 
 	virtual ~Event(){}
 
 	virtual void SniffingPlcEvent() = 0;
-	virtual void SendEapData(unsigned char* data) = 0;
+	virtual void SendEapData(unsigned char* data);
 
 	void SetMachineContex(MachineContex* mc)
 	{
@@ -293,6 +292,8 @@ public:
 	}
 
 protected:
+
+	int ReadData(unsigned char*);
 
 	unsigned int m_direction;  // 0 ---- EAP-->PLC         1 ---- PLC-->EAP
 
@@ -311,7 +312,7 @@ protected:
 
 	MachineContex *m_machineContex;
 
-	char m_lastData[EV_DATA_BUFF_LEN];
+//	char m_lastData[EV_DATA_BUFF_LEN];
 
 	unsigned short m_sequenceID;
 };
@@ -357,7 +358,7 @@ public:
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_HeareBeat(){}
-	virtual void SendEapData(unsigned char* data);
+
 	virtual void SniffingPlcEvent();
 };
 

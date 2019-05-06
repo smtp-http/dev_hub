@@ -122,7 +122,7 @@ void Machine::OnTimer(TimerID tid)
 			.ResultCode = RESULT_Pass,
 			.TimeTicks = GetTime()
 		};
-		cout << hb_eap.SequenceID << endl;
+		cout << "++ send heart beat: " << hb_eap.SequenceID << endl;
 		ev_hb->SendEapData((unsigned char*)(&hb_eap));
 	}
 }
