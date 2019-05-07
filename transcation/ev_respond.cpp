@@ -199,6 +199,19 @@ void Ev_NoticeMessage::SniffingPlcEvent()
 
 void Ev_AlarmCode::SniffingPlcEvent()
 {
+	Json::Value root;
+	Json::Value arraySections;
+	Json::Value section;
+	Json::Value arrayMachines;
+	Json::Value machine;
+	Json::Value arrayEvents;
+	Json::Value event;
+	Json::Value alarm_info;
+
+	Json::Value alarmList;
+
+	bool isHaveAlarm = false;
+
 	unsigned char rd_buf[EV_DATA_BUFF_LEN];
 	
 	int ret = ReadData(rd_buf);
@@ -211,17 +224,24 @@ void Ev_AlarmCode::SniffingPlcEvent()
 	struct Fream_AlarmCode_plc* ac_plc = (struct Fream_AlarmCode_plc*)rd_buf;
 	if(m_sequenceID != BLEndianUshort(ac_plc->SequenceID,m_machineContex->WordSwap)){
 		
-		printf("  alarm: ");
-		for(int i = 0; i < m_plcDataSize; i++) {
-			printf("%x ",rd_buf[i]);
-		}
+		//printf("  alarm: ");
+		//for(int i = 0; i < m_plcDataSize; i++) {
+		//	printf("%x ",rd_buf[i]);
+		//}
 
-		printf("\n");
+		//printf("\n");
+		
+		section["Name"] = m_machineContex->SectionName().c_str();
+		machine["Name"] = m_machineContex->MachineName().c_str();
+		event["Name"] = m_eventName;
+		event["Action"]= m_eventAction;
+		
+		
 
 		m_sequenceID = BLEndianUshort(ac_plc->SequenceID,m_machineContex->WordSwap);
-		cout << "---- s id: " << m_sequenceID << endl;
+		//cout << "---- s id: " << m_sequenceID << endl;
 		//cout << "  Content: " << ac_plc->Content<<endl;
-		cout << "  ev_code: " << ac_plc->EventCode << endl;
+		//cout << "  ev_code: " << ac_plc->EventCode << endl;
 
 		for(int i = 0;i < ALARM_CONTENT_LEN;i ++){
 			cout << BLEndianUshort(ac_plc->Content[i],m_machineContex->WordSwap) << " ";
@@ -231,15 +251,38 @@ void Ev_AlarmCode::SniffingPlcEvent()
 					if(m_machineContex != NULL) {
 						PlcAlarmInfo_t* alarm = m_machineContex->PlcAlarmCodeList[i*0x10 + j];
 						if(alarm != NULL){
-							cout << alarm->Name << " " << alarm->Enable << " " << alarm->WordOffset << " " << alarm->BitOffset;
+							if(!alarm->Enable){
+								continue;
+							}
+
+							isHaveAlarm = true;
+
+							alarm_info["Name"] = alarm->Name.c_str();
+							alarm_info["Status"] = alarm->Status;
+							alarm_info["Level"] = alarm->Level.c_str();
+
+							alarmList.append(alarm_info);
+							//cout << alarm->Name << " " << alarm->Enable << " " << alarm->WordOffset << " " << alarm->BitOffset;
 						}
 					}
 				}
 			}
 		}
-		cout << endl;
 
-		m_evUpdater.UpdateEvent("alarm\n",7);
+		if(isHaveAlarm){
+			event["AlarmList"] = alarmList;
+			arrayEvents.append(event);
+			machine["EventList"] = arrayEvents;
+			arrayMachines.append(machine);
+			section["MachineList"] = arrayMachines;
+			arraySections.append(section);
+			root["SectionList"] = arraySections;
+			
+			string out = root.toStyledString();
+			
+			m_evUpdater.UpdateEvent(out.c_str(),out.length());
+		}
+		
 
 		struct Fream_AlarmCode_eap ac = {
 			.SequenceID = m_sequenceID,
@@ -256,6 +299,15 @@ void Ev_AlarmCode::SniffingPlcEvent()
 
 void Ev_MachineStatus::SniffingPlcEvent()
 {
+	Json::Value root;
+	Json::Value arraySections;
+	Json::Value section;
+	Json::Value arrayMachines;
+	Json::Value machine;
+	Json::Value arrayEvents;
+	Json::Value event;
+	//Json::Value status;
+
 	unsigned char rd_buf[EV_DATA_BUFF_LEN];
 
 	int ret = ReadData(rd_buf);
@@ -265,22 +317,31 @@ void Ev_MachineStatus::SniffingPlcEvent()
 	}
 
 
+
 	struct Fream_MachineStatus_plc* ms_plc = (struct Fream_MachineStatus_plc*)rd_buf;
 	if(m_sequenceID != BLEndianUshort(ms_plc->SequenceID,m_machineContex->WordSwap)){
 
-		printf(" status: ");
-		for(int i = 0; i < m_plcDataSize; i++) {
-			printf("%x ",rd_buf[i]);
-		}
+		section["Name"] = m_machineContex->SectionName().c_str();
+		machine["Name"] = m_machineContex->MachineName().c_str();
+		event["Name"] = m_eventName;
+		event["Action"]= m_eventAction;
 
-		printf("\n");
+		event["MachineStateCode"] = BLEndianUshort(ms_plc->MachineStateCode,m_machineContex->WordSwap);
+
+		arrayEvents.append(event);
+		machine["EventList"] = arrayEvents;
+		arrayMachines.append(machine);
+		section["MachineList"] = arrayMachines;
+		arraySections.append(section);
+		root["SectionList"] = arraySections;
+		
+		string out = root.toStyledString();
+
+		m_evUpdater.UpdateEvent(out.c_str(),out.length());
+
 
 		m_sequenceID = BLEndianUshort(ms_plc->SequenceID,m_machineContex->WordSwap);
-		cout << "---- s id: " << m_sequenceID << endl;
-		cout << "StateCode: " << ms_plc->MachineStateCode<<endl;
-		cout << "  ev_code: " << ms_plc->EventCode << endl;
-
-		m_evUpdater.UpdateEvent("status\n",8);
+		
 
 		struct Fream_MachineStatus_eap ms = {
 			.SequenceID = m_sequenceID,
@@ -296,6 +357,14 @@ void Ev_MachineStatus::SniffingPlcEvent()
 
 void Ev_MachineYield::SniffingPlcEvent()
 {
+	Json::Value root;
+	Json::Value arraySections;
+	Json::Value section;
+	Json::Value arrayMachines;
+	Json::Value machine;
+	Json::Value arrayEvents;
+	Json::Value event;
+
 	unsigned char rd_buf[EV_DATA_BUFF_LEN];
 
 	int ret = ReadData(rd_buf);
@@ -308,22 +377,22 @@ void Ev_MachineYield::SniffingPlcEvent()
 	struct Fream_MachineYield_plc* my_plc = (struct Fream_MachineYield_plc*)rd_buf;
 	if(m_sequenceID != BLEndianUshort(my_plc->SequenceID,m_machineContex->WordSwap)){
 
-		printf(" status: ");
-		for(int i = 0; i < m_plcDataSize; i++) {
-			printf("%x ",rd_buf[i]);
-		}
-
-		printf("\n");
-
 		m_sequenceID = BLEndianUshort(my_plc->SequenceID,m_machineContex->WordSwap);
-		cout << "---- s id: " << m_sequenceID << endl;
-		cout << "  ev_code: " << BLEndianUshort(my_plc->EventCode,m_machineContex->WordSwap) << endl;
-		cout << "    Input: " << BLEndianIntSwap(my_plc->Input,m_machineContex->IntSwap) << endl;
-		cout << "   Output: " << BLEndianIntSwap(my_plc->Output,m_machineContex->IntSwap) << endl;
-		cout << "    Yield: " << BLEndianUshort(my_plc->Yield,m_machineContex->WordSwap) << endl;
-		cout << "      Oee: " << BLEndianUshort(my_plc->Oee,m_machineContex->WordSwap) << endl;
 
-		m_evUpdater.UpdateEvent("yield\n",8);
+		section["Name"] = m_machineContex->SectionName().c_str();
+		machine["Name"] = m_machineContex->MachineName().c_str();
+		event["Name"] = m_eventName;
+		event["Action"]= m_eventAction;
+
+		event["Input"] = BLEndianIntSwap(my_plc->Input,m_machineContex->IntSwap);
+		event["Output"] = BLEndianIntSwap(my_plc->Output,m_machineContex->IntSwap);
+		event["Yield"] = BLEndianUshort(my_plc->Yield,m_machineContex->WordSwap);
+		event["Oee"] = BLEndianUshort(my_plc->Oee,m_machineContex->WordSwap);
+
+		string out = root.toStyledString();
+
+
+		m_evUpdater.UpdateEvent(out.c_str(),out.length());
 
 		struct Fream_MachineYield_eap my = {
 			.SequenceID = m_sequenceID,
