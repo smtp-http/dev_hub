@@ -142,10 +142,11 @@ struct Fream_BreakPoint_eap {
 
 
 /******************  AlarmCode  *********************/
+#define ALARM_CONTENT_LEN 20
 struct Fream_AlarmCode_plc {
 	unsigned short SequenceID;
 	unsigned short EventCode;
-	unsigned char Content[40];
+	unsigned short Content[ALARM_CONTENT_LEN];
 }__attribute__((__packed__));
 
 struct Fream_AlarmCode_eap {
@@ -239,7 +240,7 @@ struct EvPara
 class IEventUpdater
 {
 public:
-	virtual void UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,unsigned char* data,unsigned int len) = 0;
+	virtual void UpdateEvent(const char* msg,unsigned int len) = 0;//(std::string sectionName,std::string machineName,std::string eventName,unsigned char* data,unsigned int len) = 0;
 };
 
 class ev_reciver : public IEventUpdater
@@ -248,7 +249,7 @@ public:
 	virtual ~ev_reciver();
 
 	static ev_reciver& GetInstance();
-	virtual void UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,unsigned char* data,unsigned int len);
+	virtual void UpdateEvent(const char* msg,unsigned int len);//(std::string sectionName,std::string machineName,std::string eventName,unsigned char* data,unsigned int len);
 
 	friend class Director;
 private:

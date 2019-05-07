@@ -194,6 +194,14 @@ void MachinePlcBuilder::BuildMachine(string sectionName,LineMachine_t* lineMachi
 		}
 	}
 
+	for(vector<PlcAlarmInfo_t*>::const_iterator iter = mainDevPro->AlarmCodeList.begin();iter != mainDevPro->AlarmCodeList.end();iter++){
+		PlcAlarmInfo_t* alarm = *iter;
+		unsigned int offset = alarm->WordOffset * 0x10 + alarm->BitOffset;
+		//cout << "++++ offset: " << offset << endl;
+		contex->PlcAlarmCodeList.insert(pair<unsigned int, PlcAlarmInfo_t*>(offset,alarm));
+	}
+
+
 	//contex->
 	// connect to plc
 	PlcProxy* proxy = contex->GetProxy();

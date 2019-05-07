@@ -64,9 +64,9 @@ ev_reciver& ev_reciver::GetInstance()
 	return _instance;
 }
 
-void ev_reciver::UpdateEvent(std::string sectionName,std::string machineName,std::string eventName,unsigned char* eventData,unsigned int len)
+void ev_reciver::UpdateEvent(const char* msg,unsigned int len)
 {
-
+	m_client->SendMsg(msg,len);
 }
 
 
@@ -220,8 +220,26 @@ void Ev_AlarmCode::SniffingPlcEvent()
 
 		m_sequenceID = BLEndianUshort(ac_plc->SequenceID,m_machineContex->WordSwap);
 		cout << "---- s id: " << m_sequenceID << endl;
-		cout << "  Content: " << ac_plc->Content<<endl;
+		//cout << "  Content: " << ac_plc->Content<<endl;
 		cout << "  ev_code: " << ac_plc->EventCode << endl;
+
+		for(int i = 0;i < ALARM_CONTENT_LEN;i ++){
+			cout << BLEndianUshort(ac_plc->Content[i],m_machineContex->WordSwap) << " ";
+			for(int j = 0;j < 16;j ++) {
+				if((BLEndianUshort(ac_plc->Content[i],m_machineContex->WordSwap) & (0x0001 << j)) != 0){
+					cout << " *******$:  " << i << " " << j << endl;
+					if(m_machineContex != NULL) {
+						PlcAlarmInfo_t* alarm = m_machineContex->PlcAlarmCodeList[i*0x10 + j];
+						if(alarm != NULL){
+							cout << alarm->Name << " " << alarm->Enable << " " << alarm->WordOffset << " " << alarm->BitOffset;
+						}
+					}
+				}
+			}
+		}
+		cout << endl;
+
+		m_evUpdater.UpdateEvent("alarm\n",7);
 
 		struct Fream_AlarmCode_eap ac = {
 			.SequenceID = m_sequenceID,
@@ -261,6 +279,8 @@ void Ev_MachineStatus::SniffingPlcEvent()
 		cout << "---- s id: " << m_sequenceID << endl;
 		cout << "StateCode: " << ms_plc->MachineStateCode<<endl;
 		cout << "  ev_code: " << ms_plc->EventCode << endl;
+
+		m_evUpdater.UpdateEvent("status\n",8);
 
 		struct Fream_MachineStatus_eap ms = {
 			.SequenceID = m_sequenceID,
@@ -303,7 +323,7 @@ void Ev_MachineYield::SniffingPlcEvent()
 		cout << "    Yield: " << BLEndianUshort(my_plc->Yield,m_machineContex->WordSwap) << endl;
 		cout << "      Oee: " << BLEndianUshort(my_plc->Oee,m_machineContex->WordSwap) << endl;
 
-		
+		m_evUpdater.UpdateEvent("yield\n",8);
 
 		struct Fream_MachineYield_eap my = {
 			.SequenceID = m_sequenceID,

@@ -34,6 +34,19 @@ typedef struct Settings
 	unsigned int DataSize;
 }Settings_t;
 
+typedef struct PlcAlarmInfo
+{
+	string Name;
+	string Remark;
+	bool Enable;
+	unsigned long long UpdateTimeTicks;
+	bool Status;
+	string Level;
+	unsigned int Duration;
+	unsigned int WordOffset;
+	unsigned int BitOffset;
+}PlcAlarmInfo_t;
+
 
 typedef struct MainDeviceProfile
 {
@@ -63,6 +76,7 @@ typedef struct MainDeviceProfile
 	Settings_t PlcDataBlock;
 	Settings_t EapDataBlock;
 	vector<StationEventProfile_t*> mainEvents;
+	vector<PlcAlarmInfo_t*> AlarmCodeList;
 
 	string DataFormat;
 }MainDeviceProfile_t;

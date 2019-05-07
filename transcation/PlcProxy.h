@@ -2,6 +2,8 @@
 #define __PLC_PROXY_H__
 
 #include <string>
+#include <map>
+#include "station.h"
 #include "eventlooper.h"
 
 #define CONNECT_OK  0
@@ -48,6 +50,7 @@ public:
 	bool IntSwap;
 	bool LongSwap;
 
+	std::map<unsigned int,PlcAlarmInfo_t*> PlcAlarmCodeList;
 protected:
 	PlcProxy* m_proxy;
 	std::string m_protocolType;

@@ -43,6 +43,59 @@ int GetEventProfile(StationEventProfile_t *event,TiXmlNode *StationEventProfileN
 	return 0;
 }
 
+	string Name;
+	string Remark;
+	bool Enable;
+	unsigned long long UpdateTimeTicks;
+	bool Status;
+	string Level;
+	unsigned int Duration;
+	unsigned int WordOffset;
+	unsigned int BitOffset;
+
+int GetAlarmCodeList(PlcAlarmInfo_t* alarm,TiXmlNode* PlcAlarmInfoNode)
+{
+	TiXmlElement* alarmInfoElement = PlcAlarmInfoNode->ToElement();
+
+	if(!strcmp(alarmInfoElement->Value(),"Name")) {
+		alarm->Name = alarmInfoElement->GetText();
+	} else if(!strcmp(alarmInfoElement->Value(),"Remark")) {
+		alarm->Remark = alarmInfoElement->GetText();
+	} else if(!strcmp(alarmInfoElement->Value(),"Enable")) {
+		string EnableStr = alarmInfoElement->GetText();
+		if(!strcmp(EnableStr.c_str(),"true")) {
+			alarm->Enable = true;
+		} else if (!strcmp(EnableStr.c_str(),"false")) {
+			alarm->Enable = false;
+		}
+	} else if(!strcmp(alarmInfoElement->Value(),"UpdateTimeTicks")) {
+		string ticks = alarmInfoElement->GetText();
+		alarm->UpdateTimeTicks = strtoull (ticks.c_str(), NULL, 0);
+	} else if(!strcmp(alarmInfoElement->Value(),"Status")) {
+		string EnableStr = alarmInfoElement->GetText();
+		if(!strcmp(EnableStr.c_str(),"true")) {
+			alarm->Status = true;
+		} else if (!strcmp(EnableStr.c_str(),"false")) {
+			alarm->Status = false;
+		}
+	} else if(!strcmp(alarmInfoElement->Value(),"Level")) { 
+		alarm->Level = alarmInfoElement->GetText();
+	}else if(!strcmp(alarmInfoElement->Value(),"Duration")) {
+		string dur = alarmInfoElement->GetText();
+		alarm->Duration = strtoul(dur.c_str(), NULL, 10);
+	}else if(!strcmp(alarmInfoElement->Value(),"WordOffset")) {
+		string off = alarmInfoElement->GetText();
+		alarm->WordOffset = strtoul(off.c_str(), NULL, 10);
+	}else if(!strcmp(alarmInfoElement->Value(),"BitOffset")) {
+		string off = alarmInfoElement->GetText();
+		alarm->BitOffset = strtoul(off.c_str(), NULL, 10);
+	} else{
+		return -1;
+	}
+
+	return 0;
+}
+
 
 
 vector<LineMachine_t*> *GetLineMachineList(TiXmlNode *MachineNode)
@@ -305,9 +358,12 @@ vector<LineMachine_t*> *GetLineMachineList(TiXmlNode *MachineNode)
 								if(!strcmp(AlarmCodeListNode->Value(),"PlcAlarmInfo")) {
 									PlcAlarmInfoElement = AlarmCodeListNode->ToElement();
 									PlcAlarmInfoNode = PlcAlarmInfoElement->FirstChildElement();
+									PlcAlarmInfo_t* plcAlarmInfo = new(PlcAlarmInfo_t);
 									for(;PlcAlarmInfoNode != NULL;PlcAlarmInfoNode = PlcAlarmInfoNode->NextSibling()) {
-										////printf("PlcAlarmInfoNode: 0x%x   %s\n",PlcAlarmInfoNode,PlcAlarmInfoNode->Value()); 
+										GetAlarmCodeList(plcAlarmInfo,PlcAlarmInfoNode);
 									}
+
+									machine->mainDeviceProfile.AlarmCodeList.push_back(plcAlarmInfo);
 								}
 							}
 						} else if(!strcmp(MainDeviceProfileNode->Value(),"NormalSettingList")){
@@ -325,8 +381,7 @@ vector<LineMachine_t*> *GetLineMachineList(TiXmlNode *MachineNode)
 							}
 						} else if(!strcmp(MainDeviceProfileNode->Value(),"DataFormat")){
 							machine->mainDeviceProfile.DataFormat = MainDeviceProfileNode->ToElement()->GetText();
-							cout << "+++++++ DataFormat:" << machine->mainDeviceProfile.DataFormat << endl;
-						}
+						} 
 					}
 				} else if(!strcmp(LineMachineNode->Value(),"CarrierSlotCount")) {
 					string size = LineMachineNode->ToElement()->GetText();
@@ -406,7 +461,6 @@ vector<LineMachine_t*> *GetLineMachineList(TiXmlNode *MachineNode)
 			lm->push_back(machine);
 		}
 	}
-
 
 	return lm;
 }

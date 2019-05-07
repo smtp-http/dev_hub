@@ -47,6 +47,11 @@ public:
 		m_frameRecver = fr;
 	}
 
+	int SendMsg(const char* buf,unsigned int len)
+	{
+		return m_connection->Send(buf, len);
+	}
+
 	bool Connect()
 	{
 		if (m_connector)
