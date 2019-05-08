@@ -348,7 +348,7 @@ void Director::MachinesPolling()
 }
 
 
-int Director::WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,unsigned char *data)
+int Director::WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,Json::Value &eap_data)
 {
 	Machine *m = m_machines[sectionName + machineName];
 
@@ -358,12 +358,65 @@ int Director::WriteMachineData(std::string sectionName,std::string machineName,s
 
 	Event *ev = m->GetEvent(eventName);
 
-	ev->SendEapData(data);
+	ev->SendEapData(eap_data);
 } 
 
 bool Director::OnFrame(string& frame)
 {
-	
+	cout << "---- cmd:" << frame << endl;
+	Json::Reader reader;  
+	Json::Value root;  
+	unsigned int SequenceID;
+
+
+	if (reader.parse(frame, root))  {
+		if(!root["SequenceID"].isNull() && root["SequenceID"].isInt()){
+			SequenceID = root["SequenceID"].asInt();
+		} else {
+			printf("%s:%d  SequenceID is null or error format!\n",__FILE__,__LINE__);
+			return false;
+		}
+
+		if(root["SectionList"].isNull()){
+			printf("%s:%d  SectionList is null!\n",__FILE__,__LINE__);
+			return false;
+		}
+
+		Json::Value SectionList  = root["SectionList"];
+		for(unsigned int i = 0; i < SectionList.size(); i++){
+			string sectionName;
+
+			if ( !SectionList[i]["Name"].isNull() && SectionList[i]["Name"].isString()) {
+				sectionName = SectionList[i]["Name"].asString();
+			} else {
+				printf("%s:%d  section[%d] name is null or error format!\n",__FILE__,__LINE__,i);
+				continue;
+			}
+
+			Json::Value MachineList  = SectionList[i]["MachineList"];
+			for(unsigned int j = 0; j < MachineList.size(); j++){
+				string machineName;
+				if ( !MachineList[j]["Name"].isNull() && MachineList[j]["Name"].isString()) {
+					machineName = MachineList[j]["Name"].asString();
+				} else {
+					printf("%s:%d  machine[%d] name is null or error format!\n",__FILE__,__LINE__,j);
+					continue;
+				}
+
+				Json::Value EventList  = SectionList[i]["EventList"];
+				for(unsigned int j = 0; j < EventList.size(); j++){
+					string eventName;
+					if ( !EventList[j]["Name"].isNull() && EventList[j]["Name"].isString()) {
+						eventName = EventList[j]["Name"].asString();
+						WriteMachineData(sectionName,machineName,eventName,EventList[j]);
+					} else {
+						printf("%s:%d  event[%d] name is null or error format!\n",__FILE__,__LINE__,j);
+						continue;
+					}
+				}
+			}
+		}
+	}  
 }
 
 ///////////////////////////////////////////////////  MachineScheduler /////////////////////////////////////////////////////

@@ -112,7 +112,7 @@ public:
 
 	void MachinesPolling();
 
-	int WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,unsigned char *data);
+	int WriteMachineData(std::string sectionName,std::string machineName,std::string eventName,Json::Value&);
 
 	virtual bool OnFrame(string& frame);
 	

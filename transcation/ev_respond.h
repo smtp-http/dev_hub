@@ -3,6 +3,7 @@
 
 #include <string>
 #include <string.h>
+#include "config.h"
 #include "TcpClient.h"
 #include "PlcProxy.h"
 
@@ -280,6 +281,8 @@ public:
 
 	virtual void SniffingPlcEvent() = 0;
 	virtual void SendEapData(unsigned char* data);
+	virtual void SendEapData(Json::Value &eap_data)
+	{}
 
 	void SetMachineContex(MachineContex* mc)
 	{
@@ -329,7 +332,7 @@ public:
 	}
 
 	virtual ~Ev_Register(){}
-	virtual void SendEapData(unsigned char* data);
+	virtual void SendEapData(Json::Value &eap_data);
 	virtual void SniffingPlcEvent();
 };
 
@@ -339,10 +342,11 @@ class Ev_EapCommand : public Event
 public:
 	Ev_EapCommand(struct EvPara* ev_para)
 	{
+		m_direction = 0;
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_EapCommand(){}
-	virtual void SendEapData(unsigned char* data);
+	virtual void SendEapData(Json::Value &eap_data);
 	virtual void SniffingPlcEvent();
 };
 
@@ -375,7 +379,7 @@ public:
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_EventChangedFlag(){}
-	virtual void SendEapData(unsigned char* data);
+	//virtual void SendEapData(unsigned char* data);
 	virtual void SniffingPlcEvent();
 };
 
@@ -393,7 +397,7 @@ public:
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_NoticeMessage(){}
-	virtual void SendEapData(unsigned char* data);
+	virtual void SendEapData(Json::Value &eap_data);
 	virtual void SniffingPlcEvent();
 };
 
@@ -409,7 +413,7 @@ public:
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_BreakPoint(){}
-	virtual void SendEapData(unsigned char* data);
+	//virtual void SendEapData(unsigned char* data);
 	virtual void SniffingPlcEvent();
 };
 
@@ -467,7 +471,7 @@ public:
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_CheckIn(){}
-	virtual void SendEapData(unsigned char* data);
+	//virtual void SendEapData(unsigned char* data);
 	virtual void SniffingPlcEvent();
 };
 
@@ -482,7 +486,7 @@ public:
 		EV_PARAM_INIT(ev_para)
 	}
 	virtual ~Ev_PostResult(){}
-	virtual void SendEapData(unsigned char* data);
+	//virtual void SendEapData(unsigned char* data);
 	virtual void SniffingPlcEvent();
 };
 

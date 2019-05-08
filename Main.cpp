@@ -166,7 +166,7 @@ int main(int argc, char **argv)
 	//sc.LoadUserConfig(tm);
 	sc.LoadUserConfig(fm);
 
-	
+#endif
 #ifdef __kepalive
 	if (process_exist(__process__) != 0) {
         printf("process: %s exist\n", __process__);
@@ -178,7 +178,7 @@ int main(int argc, char **argv)
 	daemon(1, 1);
 	process_keepalive();
 #endif
-#endif
+
 	EventLooperImp &el = (EventLooperImp&)EventLooper::GetInstance();
 	cout << "-- event base: " << el.CurrentEvBase() << endl;
 	el.RunEventLoop();

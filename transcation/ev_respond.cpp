@@ -1,6 +1,5 @@
 
 #include "ev_respond.h"
-#include "config.h"
 #include <time.h>
 using namespace std;
 
@@ -108,7 +107,7 @@ void Event::SendEapData(unsigned char* data)
 
 //======================  Ev_Register ======================
 
-void Ev_Register::SendEapData(unsigned char* data)
+void Ev_Register::SendEapData(Json::Value &eap_data)
 {
 
 }
@@ -123,7 +122,7 @@ void Ev_Register::SniffingPlcEvent()
 //======================  Ev_EapCommand ======================
 
 
-void Ev_EapCommand::SendEapData(unsigned char* data)
+void Ev_EapCommand::SendEapData(Json::Value &eap_data)
 {
 
 }
@@ -158,10 +157,6 @@ void Ev_HeareBeat::SniffingPlcEvent()
 
 
 /******************  Ev_EventChangedFlag  *********************/
-void Ev_EventChangedFlag::SendEapData(unsigned char* data)
-{
-
-}
 
 
 void Ev_EventChangedFlag::SniffingPlcEvent()
@@ -171,10 +166,6 @@ void Ev_EventChangedFlag::SniffingPlcEvent()
 
 
 /******************  Ev_BreakPoint  *********************/
-void Ev_BreakPoint::SendEapData(unsigned char* data)
-{
-
-}
 
 
 void Ev_BreakPoint::SniffingPlcEvent()
@@ -184,7 +175,7 @@ void Ev_BreakPoint::SniffingPlcEvent()
 
 
 /******************  Ev_NoticeMessage  *********************/
-void Ev_NoticeMessage::SendEapData(unsigned char* data)
+void Ev_NoticeMessage::SendEapData(Json::Value &eap_data)
 {
 
 }
@@ -407,10 +398,6 @@ void Ev_MachineYield::SniffingPlcEvent()
 
 /******************  Ev_CheckIn  *********************/
 
-void Ev_CheckIn::SendEapData(unsigned char* data)
-{
-
-}
 
 
 void Ev_CheckIn::SniffingPlcEvent()
@@ -421,10 +408,6 @@ void Ev_CheckIn::SniffingPlcEvent()
 
 /******************  Ev_PostResult  *********************/
 
-void Ev_PostResult::SendEapData(unsigned char* data)
-{
-
-}
 
 
 void Ev_PostResult::SniffingPlcEvent()
