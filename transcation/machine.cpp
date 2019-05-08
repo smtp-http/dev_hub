@@ -363,13 +363,18 @@ int Director::WriteMachineData(std::string sectionName,std::string machineName,s
 
 bool Director::OnFrame(string& frame)
 {
-	cout << "---- cmd:" << frame << endl;
+	//cout << "---- cmd:" << frame << endl;
 	Json::Reader reader;  
 	Json::Value root;  
 	unsigned int SequenceID;
 
 
-	if (reader.parse(frame, root))  {
+	if (reader.parse(frame, root)) {
+		if(!root.isObject()){
+			printf("%s:%d  root is error format!\n",__FILE__,__LINE__);
+			return false;
+		}
+		//cout << "frame: " << frame << "  root: " << root << endl; 
 		if(!root["SequenceID"].isNull() && root["SequenceID"].isInt()){
 			SequenceID = root["SequenceID"].asInt();
 		} else {
