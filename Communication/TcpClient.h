@@ -124,9 +124,16 @@ protected:
 		delete m_connection;
 		m_connection = NULL;
 
-		EventLooper &el = EventLooper::GetInstance();
+		delete m_connector;
+		m_connector = NULL;
 
-		el.StopEventLoop(100);
+		if (m_timerReconn == -1){
+			struct timeval tv={1, 0};
+			m_timerReconn = EventLooper::GetInstance().ScheduleTimer(&tv, TF_FIRE_PERIODICALLY, this);
+		}
+		//EventLooper &el = EventLooper::GetInstance();
+
+		//el.StopEventLoop(100);
 	}
 
 	virtual void OnTimer(TimerID tid)
@@ -134,6 +141,8 @@ protected:
 		//cout << "OnTimer " << tid << endl;
 		if(tid == m_timerReconn){
 			cout << "start to reconnecting ... " << endl;
+			EventLooper::GetInstance().CancelTimer(m_timerReconn);
+			m_timerReconn = -1;
 			Connect();
 		}
 	}
