@@ -454,7 +454,11 @@ LineStationDesiginProfile_t* GetLineStationDesiginProfile(std::string xmlFile);
 void MachineScheduler::FlashLineMachineList()
 {
 	LineStationDesiginProfile_t *ls = GetLineStationDesiginProfile(SysConfig::Instance().GetPluginLineDesignerXml());
-	
+	if(ls == NULL){
+		printf("%s:%d  LineStationDesiginProfile  null!\n",__FILE__,__LINE__);
+		exit(1);
+	}
+
 	for (vector<LineSection_t*>::const_iterator iter_sec = ls->LineSections->begin();iter_sec != ls->LineSections->end();iter_sec++) {
 		m_sections[(*iter_sec)->Name] = *iter_sec;
 		vector<LineMachine_t*>* lm_list = (*iter_sec)->Machines;//GetLineMachineList(m_xmlFile);

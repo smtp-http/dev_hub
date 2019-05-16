@@ -6,7 +6,7 @@ LDFLAGS +=  $(TOPDIR)/vendor/$(LIBSDIR)/libevent.a  $(TOPDIR)/vendor/$(LIBSDIR)/
 ifdef TOOLCHAIN_NAME
 	#LDFLAGS += $(TOPDIR)/vendor/$(LIBSDIR)/libexpat.a 
 else
-	LDFLAGS += -lexpat 
+	LDFLAGS += #-lexpat 
 endif
 
 LDFLAGS += -lpthread -ldl  -lstdc++ -lrt  #-lexpat 
