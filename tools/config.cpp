@@ -73,6 +73,10 @@ int SysConfig::LoadConfig()
 		
 		if(root["PollingCycle"].isInt())
 			PollingCycle = root["PollingCycle"].asInt();
+
+		if(root["SerialModbusRtu"].isString() && !root["SerialModbusRtu"].isNull()){
+			SerialModbusRtu = root["SerialModbusRtu"].asString();
+		}
 		
 #if 0
 	//读取根节点信息

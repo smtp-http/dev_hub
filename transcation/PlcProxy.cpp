@@ -5,8 +5,10 @@ using namespace std;
 extern "C"
 {
 #include "fins.h"
+#include "modbus.h"
 }
 
+#include "config.h"
 
 PlcProxy* GetPlcProxy(string name)
 {
@@ -41,6 +43,7 @@ PlcContex::PlcContex(std::string protoName,std::string sectionName,std::string m
 	m_sectionName = sectionName;
 	m_machineName = machineName;
 
+	m_moduleNum = moduleNum;
 	m_serial = serial;
 }
 
@@ -168,8 +171,26 @@ void ModbusRtuPlcProxy::on_disconnect(MachineContex* contex)
 }
 
 
-int ModbusRtuPlcProxy::PlcConnect(MachineContex* contex)
+int ModbusRtuPlcProxy::PlcConnect(MachineContex* mc)
 {
+
+	int error_val;
+
+	if (mc == NULL) {
+		cout << "MachineContex is null!" << endl;
+		return -1;
+	}
+
+	m_contex = mc;
+
+	cout << "m_moduleNum:" << mc->m_moduleNum << "  baud: " << mc->m_serial->baud  << "  parity: " << mc->m_serial->parity << "  data_bit: " << mc->m_serial->data_bit << "  stop_bit: " << mc->m_serial->stop_bit << endl;
+
+	if ( m_connectionStatus == CONNECT_OK) {
+		return 0;
+	}
+
+
+	m_plcConnectHandle = modbus_new_rtu(SysConfig::Instance().SerialModbusRtu.c_str(), 9600, 'N', 8, 2);
 
 }
 

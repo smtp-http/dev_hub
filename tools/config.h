@@ -26,6 +26,7 @@ public:
 	std::string GetPlcProtocol(){return plcProtocol;}
 	std::string GetPluginLineDesignerXml(){return pluginLineDesignerXml;}
 	unsigned int GetPollingCycle(){return PollingCycle;}
+	std::string SerialModbusRtu;
 private:
 	SysConfig(){}
 	std::list<IConfigUser *> m_users;

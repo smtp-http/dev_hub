@@ -9,6 +9,8 @@
 #define CONNECT_OK  0
 #define CONNECT_NO  1
 
+
+
 using namespace lux;
 
 class PlcProxy;
@@ -53,21 +55,25 @@ public:
 	std::string m_ip;
 	unsigned int m_port;
 
+	unsigned int m_moduleNum;
+
 	bool ReadSkipZero;
 	bool WordSwap;
 	bool IntSwap;
 	bool LongSwap;
 
 	std::map<unsigned int,PlcAlarmInfo_t*> PlcAlarmCodeList;
+
+	SerialParameter_t* m_serial;
+
+
 protected:
 	PlcProxy* m_proxy;
 	std::string m_protocolType;
 
 	std::string m_sectionName;
 	std::string m_machineName;
-
-	SerialParameter_t* m_serial;
-
+	
 };
 
 

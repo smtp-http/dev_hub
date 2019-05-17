@@ -1,6 +1,7 @@
 {
   "Version": "1.0",
   "UperComputerIp":"172.17.208.22",
+  "SerialModbusRtu" : "/dev/ttyUSB0",
   "UperComputerPort" : 9601,
   "PluginLineDesignerXml":"Plugin.LineDesigner.xml",
   "PollingCycle" : 200,
