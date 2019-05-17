@@ -29,8 +29,15 @@ LOCAL_LIBS :=  ./tools/libtools.a ./Communication/libconn.a ./device/libdevice.a
 
 LIBSCAN = libscanner.a
 
+MODCLI = mod_client
+OBCLI = unit-test-client.o
+
+MODSVR = mod_server
+OBSVR = unit-test-server.o
 
 all : device  equipment tools Communication mqtt transcation $(TARGET)
+modcli : device  equipment tools Communication mqtt transcation $(MODCLI)
+modsvr : device  equipment tools Communication mqtt transcation $(MODSVR)
 #command
 #all : session  inireader $(TARGET)
 
@@ -43,6 +50,20 @@ $(TARGET): $(OBJS) $(LIBSCAN)
 	@echo "Linking $@"
 #	@$(CXX) -o $@ $(LOCAL_LIBS) $(LDFLAGS)
 	@$(CXX) -o $@ $(OBJS) $(LOCAL_LIBS) $(LDFLAGS)
+
+$(MODCLI): $(OBCLI) $(LIBSCAN)
+#$(TARGET): $(LIBSCAN)
+	@echo "==== target ======"
+	@echo "Linking $@"
+#	@$(CXX) -o $@ $(LOCAL_LIBS) $(LDFLAGS)
+	@$(CC) -o $@ $(OBCLI) $(LOCAL_LIBS) $(LDFLAGS)
+
+$(MODSVR): $(OBSVR) $(LIBSCAN)
+#$(TARGET): $(LIBSCAN)
+	@echo "==== target ======"
+	@echo "Linking $@"
+#	@$(CXX) -o $@ $(LOCAL_LIBS) $(LDFLAGS)
+	@$(CXX) -o $@ $(OBSVR) $(LOCAL_LIBS) $(LDFLAGS)
 
 device:
 	@echo "==== device ======"

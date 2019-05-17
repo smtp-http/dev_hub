@@ -10,11 +10,13 @@ extern "C"
 
 PlcProxy* GetPlcProxy(string name)
 {
-	FinsPlcProxy *fp;
-
 	if(name == "Fins") {
 		FinsPlcProxy* fp = new FinsPlcProxy;
 		return fp;
+	} else if(name == "ModbusRtu") {
+		ModbusRtuPlcProxy* mp = new ModbusRtuPlcProxy;
+		return mp;
+		
 	} else {
 		return NULL;
 	}
@@ -30,6 +32,16 @@ PlcContex::PlcContex(string protoName,string sectionName,string machineName,stri
 
 	m_sectionName = sectionName;
 	m_machineName = machineName;
+}
+
+PlcContex::PlcContex(std::string protoName,std::string sectionName,std::string machineName,unsigned int moduleNum,SerialParameter_t* serial)
+{
+	m_proxy = GetPlcProxy(protoName);
+
+	m_sectionName = sectionName;
+	m_machineName = machineName;
+
+	m_serial = serial;
 }
 
 
@@ -51,7 +63,7 @@ PlcProxy::~PlcProxy()
 	EventLooper::GetInstance().CancelTimer(m_reconnect);
 }
 
-//======================== FinsPlcProxy ===============================
+//===================================== FinsPlcProxy =========================================
 
 void FinsPlcProxy::OnTimer(TimerID tid)
 {
@@ -124,10 +136,7 @@ int FinsPlcProxy::PlcWriteWorlds(string dataAddr,unsigned char* data,unsigned in
 	return ret;
 }
 
-int FinsPlcProxy::PlcSendHeartbeat()
-{
-	
-}
+
 
 
 //( struct fins_sys_tp *sys, const char *start, unsigned char *data, size_t num_word );
@@ -146,5 +155,41 @@ int FinsPlcProxy::PlcReadWorlds(string plcAddr,unsigned char* recvBuf,unsigned i
 
 	return 0;
 }
+
+
+
+
+//===================================== ModbusRtuPlcProxy =========================================
+
+
+void ModbusRtuPlcProxy::on_disconnect(MachineContex* contex)
+{
+
+}
+
+
+int ModbusRtuPlcProxy::PlcConnect(MachineContex* contex)
+{
+
+}
+
+int ModbusRtuPlcProxy::PlcWriteWorlds(string dataAddr,unsigned char* data,unsigned int len)
+{
+
+}
+
+
+int ModbusRtuPlcProxy::PlcReadWorlds(string plcAddr,unsigned char* recvBuf,unsigned int recvLen)
+{
+
+}
+
+
+void ModbusRtuPlcProxy::OnTimer(TimerID tid)
+{
+
+}
+
+
 
 

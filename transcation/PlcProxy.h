@@ -14,6 +14,13 @@ using namespace lux;
 class PlcProxy;
 /////////////////////////// PclContex /////////////////////////
 
+typedef struct {
+	int baud;
+	char parity;
+	int data_bit;
+	int stop_bit;
+}SerialParameter_t;
+
 class MachineContex
 {
 public:
@@ -22,6 +29,7 @@ public:
 		, IntSwap(false)
 		, LongSwap(false)
 		, ReadSkipZero(false)
+		, m_serial(NULL)
 	{
 
 	}
@@ -58,13 +66,17 @@ protected:
 	std::string m_sectionName;
 	std::string m_machineName;
 
+	SerialParameter_t* m_serial;
+
 };
+
 
 
 class PlcContex : public MachineContex
 {
 public:
 	PlcContex(std::string protoName,std::string sectionName,std::string machineName,std::string ip,unsigned int port);
+	PlcContex(std::string protoName,std::string sectionName,std::string machineName,unsigned int moduleNum,SerialParameter_t* serial);
 	virtual ~PlcContex(){}
 
 
@@ -84,7 +96,6 @@ public:
 	virtual int PlcConnect(MachineContex*) = 0;
 	virtual int PlcWriteWorlds(std::string,unsigned char* data,unsigned int) = 0;
 	virtual int PlcReadWorlds(std::string plcAddr,unsigned char* recvBuf,unsigned int recvLen) = 0;
-	virtual int PlcSendHeartbeat() = 0;
 
 	int GetConnectionStatus()
 	{
@@ -114,9 +125,22 @@ public:
 	virtual int PlcReadWorlds(std::string plcAddr,unsigned char* recvBuf,unsigned int recvLen);
 
 	virtual void OnTimer(TimerID tid);
-	virtual int PlcSendHeartbeat();
 };
 
+
+class ModbusRtuPlcProxy : public PlcProxy
+{
+public:
+	ModbusRtuPlcProxy(){}
+	virtual ~ModbusRtuPlcProxy(){}
+
+	virtual void on_disconnect(MachineContex*);
+	virtual int PlcConnect(MachineContex*);
+	virtual int PlcWriteWorlds(std::string,unsigned char* data,unsigned int);
+	virtual int PlcReadWorlds(std::string plcAddr,unsigned char* recvBuf,unsigned int recvLen);
+
+	virtual void OnTimer(TimerID tid);
+};
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 PlcProxy* GetPlcProxy(std::string name);
