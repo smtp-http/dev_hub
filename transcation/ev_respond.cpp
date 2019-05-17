@@ -75,7 +75,7 @@ void ev_reciver::UpdateEvent(const char* msg,unsigned int len)
 
 int Event::ReadData(unsigned char *rd_buf)
 {
-	string addr = m_flag + m_plcEventAddr;
+	string addr = m_flag + m_plcEventAddr;  // fins: flag is a string, like "DM".  for modbus rtu ,it is null string
 
 	PlcProxy* plcProxy = m_machineContex->GetProxy();//&PlcProxy::Instance();
 	
@@ -100,7 +100,7 @@ void Event::SendEapData(unsigned char* data)
 	}
 
 
-	string addr = m_flag + m_eapEventAddr;
+	string addr = m_flag + m_eapEventAddr;                 // fins: flag is a string, like "DM".  for modbus rtu ,it is null string
 	plcProxy->PlcWriteWorlds(addr,data,m_eapDataSize);
 }
 

@@ -109,7 +109,7 @@ public:
 	}
 
 protected:
-	virtual void OnTimer(TimerID tid){}
+	virtual void OnTimer(TimerID tid);
 
 	TimerID m_reconnect;
 
@@ -130,7 +130,6 @@ public:
 	virtual int PlcWriteWorlds(std::string,unsigned char* data,unsigned int);
 	virtual int PlcReadWorlds(std::string plcAddr,unsigned char* recvBuf,unsigned int recvLen);
 
-	virtual void OnTimer(TimerID tid);
 };
 
 
@@ -145,7 +144,6 @@ public:
 	virtual int PlcWriteWorlds(std::string,unsigned char* data,unsigned int);
 	virtual int PlcReadWorlds(std::string plcAddr,unsigned char* recvBuf,unsigned int recvLen);
 
-	virtual void OnTimer(TimerID tid);
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -235,7 +235,7 @@ struct EvPara
 	unsigned int plcDataSize;
 	std::string  eapEventAddr;
 	unsigned int eapDataSize;
-	std::string  flag;
+	std::string  flag;         // fins: flag is a string, like "DM".  for modbus rtu ,it is null string
 };
 
 class IEventUpdater

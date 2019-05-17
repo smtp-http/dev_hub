@@ -44,6 +44,7 @@ PlcContex::PlcContex(std::string protoName,std::string sectionName,std::string m
 	m_machineName = machineName;
 
 	m_moduleNum = moduleNum;
+
 	m_serial = serial;
 }
 
@@ -66,9 +67,7 @@ PlcProxy::~PlcProxy()
 	EventLooper::GetInstance().CancelTimer(m_reconnect);
 }
 
-//===================================== FinsPlcProxy =========================================
-
-void FinsPlcProxy::OnTimer(TimerID tid)
+void PlcProxy::OnTimer(TimerID tid)
 {
 	if (tid == m_reconnect) {
 		if ( m_plcConnectHandle == NULL) {
@@ -79,6 +78,10 @@ void FinsPlcProxy::OnTimer(TimerID tid)
 		}
 	}
 }
+
+
+
+//===================================== FinsPlcProxy =========================================
 
 
 void FinsPlcProxy::on_disconnect(MachineContex* mc)
@@ -165,9 +168,12 @@ int FinsPlcProxy::PlcReadWorlds(string plcAddr,unsigned char* recvBuf,unsigned i
 //===================================== ModbusRtuPlcProxy =========================================
 
 
-void ModbusRtuPlcProxy::on_disconnect(MachineContex* contex)
+void ModbusRtuPlcProxy::on_disconnect(MachineContex* mc)
 {
-
+	cout << "******************* on disconnect" << endl; 
+	// TODO:   modbus disconnect   finslib_disconnect((struct fins_sys_tp*)m_plcConnectHandle);
+	m_plcConnectHandle = NULL;
+	m_connectionStatus = CONNECT_NO;
 }
 
 
@@ -175,6 +181,11 @@ int ModbusRtuPlcProxy::PlcConnect(MachineContex* mc)
 {
 
 	int error_val;
+
+	if(mc->m_serial == NULL){
+		printf("%s:%d  m_serial is null!\n",__FILE__,__LINE__);
+		return -1;
+	}
 
 	if (mc == NULL) {
 		cout << "MachineContex is null!" << endl;
@@ -190,26 +201,64 @@ int ModbusRtuPlcProxy::PlcConnect(MachineContex* mc)
 	}
 
 
-	m_plcConnectHandle = modbus_new_rtu(SysConfig::Instance().SerialModbusRtu.c_str(), 9600, 'N', 8, 2);
+	m_plcConnectHandle = modbus_new_rtu(SysConfig::Instance().SerialModbusRtu.c_str(), mc->m_serial->baud,mc->m_serial->parity, mc->m_serial->data_bit, mc->m_serial->stop_bit);
+
+	modbus_t *ctx = (modbus_t*)m_plcConnectHandle;
+	modbus_set_debug(ctx, TRUE);
+	modbus_set_error_recovery(ctx,
+							(modbus_error_recovery_mode)(MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL));
+
+	modbus_set_slave(ctx, mc->m_moduleNum);
 
 }
 
 int ModbusRtuPlcProxy::PlcWriteWorlds(string dataAddr,unsigned char* data,unsigned int len)
 {
+	// fins:dataAddr's flag is a string, like "DM".  for modbus rtu ,it is null string
+	int addr;
 
+	try{
+		addr = stoi(dataAddr);
+	} catch (std::exception &ex) {
+		printf("%s:%d  dataAddr: %s is invalid_argument!\n",__FILE__,__LINE__,dataAddr.c_str());
+		return -1;
+	}
+
+	modbus_t *ctx = (modbus_t*)m_plcConnectHandle;
+
+	int ret = modbus_write_registers(ctx,addr,len,(uint16_t*)data);
+
+	if (ret != 1) {
+		printf("%s:%d  modbus_write_registers error! ret: %d\n",__FILE__,__LINE__,ret);
+		return -1;
+	}
+
+	return 0;
 }
 
 
 int ModbusRtuPlcProxy::PlcReadWorlds(string plcAddr,unsigned char* recvBuf,unsigned int recvLen)
 {
+	int addr;
 
+	try{
+		addr = stoi(plcAddr);
+	} catch (std::exception &ex) {
+		printf("%s:%d  plcAddr: %s is invalid_argument!\n",__FILE__,__LINE__,plcAddr.c_str());
+		return -1;
+	}
+
+	modbus_t *ctx = (modbus_t*)m_plcConnectHandle;
+
+	int ret = modbus_read_registers(ctx,addr,recvLen,(uint16_t*)recvBuf);
+	if(ret != recvLen){
+		printf("%s:%d  modbus_read_registers error! ret: %d\n",__FILE__,__LINE__,ret);
+		return -1;
+	}
+
+	return 0;
 }
 
-
-void ModbusRtuPlcProxy::OnTimer(TimerID tid)
-{
-
-}
 
 
 
