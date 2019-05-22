@@ -7,6 +7,13 @@
 using namespace std;
 
 
+typedef struct {
+	std::string portName;
+	int baud;
+	char parity;
+	int data_bit;
+	int stop_bit;
+}SerialParameter_t;
 
 typedef struct StationEventProfile
 {
@@ -25,6 +32,7 @@ typedef struct StationEventProfile
 typedef struct ProtocolInfo
 {
 	string Protocol;
+	int stationId;
 }ProtocolInfo_t;
 
 typedef struct Settings
@@ -55,6 +63,7 @@ typedef struct MainDeviceProfile
 	unsigned long long UpdateTimeTicks;
 	string DeviceType;
 	ProtocolInfo_t protocolInfo;
+	SerialParameter_t serialPara;
 	string Priority;
 	unsigned long ProcessTimeout;
 	unsigned int Port;

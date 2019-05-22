@@ -168,11 +168,26 @@ PlcMachine::~PlcMachine()
 
 void MachinePlcBuilder::BuildMachine(string sectionName,LineMachine_t* lineMachine)
 {
+	MachineContex* contex;
+
 	MainDeviceProfile_t* mainDevPro = &lineMachine->mainDeviceProfile;
 
 	m_machine = new PlcMachine;
 
-	MachineContex* contex = new PlcContex("Fins",sectionName,lineMachine->Name,mainDevPro->IpAddress,mainDevPro->Port);
+
+	if(!strcmp(mainDevPro->protocolInfo.Protocol.c_str(),"Fins")){
+		contex = new PlcContex("Fins",sectionName,lineMachine->Name,mainDevPro->IpAddress,mainDevPro->Port);
+	} else if (!strcmp(mainDevPro->protocolInfo.Protocol.c_str(),"RTU")){
+		contex = new PlcContex("RTU",sectionName,lineMachine->Name,mainDevPro->protocolInfo.stationId,&mainDevPro->serialPara);  //unsigned int moduleNum,SerialParameter_t* serial)
+	} else if (!strcmp(mainDevPro->protocolInfo.Protocol.c_str(),"ModBus")){
+
+	} else {
+		printf("%s:%d  Unknown protocol type!\n",__FILE__,__LINE__);
+		delete m_machine;
+		return;
+	}
+
+	
 	m_machine->SetMachineContex(contex);
 
 	std::vector<std::string> DataFormats;

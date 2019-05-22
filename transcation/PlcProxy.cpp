@@ -15,9 +15,10 @@ PlcProxy* GetPlcProxy(string name)
 	if(name == "Fins") {
 		FinsPlcProxy* fp = new FinsPlcProxy;
 		return fp;
-	} else if(name == "ModbusRtu") {
+	} else if(name == "RTU") {
 		ModbusRtuPlcProxy* mp = new ModbusRtuPlcProxy;
 		return mp;
+	} else if (name == "ModBus") {
 		
 	} else {
 		return NULL;

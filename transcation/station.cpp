@@ -194,9 +194,39 @@ vector<LineMachine_t*> *GetLineMachineList(TiXmlNode *MachineNode)
 							for(;ProtocolNode != NULL;ProtocolNode = ProtocolNode->NextSibling()) {
 								if(!strcmp(ProtocolNode->Value(),"Protocol")){
 									machine->mainDeviceProfile.protocolInfo.Protocol = ProtocolNode->ToElement()->GetText();
-									
+								} else if(!strcmp(ProtocolNode->Value(),"StationID")){
+									string StationID = ProtocolNode->ToElement()->GetText();
+									machine->mainDeviceProfile.protocolInfo.stationId = strtoul(StationID.c_str(), NULL, 10);
 								}
 							}
+						} else if(!strcmp(MainDeviceProfileNode->Value(),"PortName")) {
+							machine->mainDeviceProfile.serialPara.portName = MainDeviceProfileNode->ToElement()->GetText();
+						} else if(!strcmp(MainDeviceProfileNode->Value(),"BaudRate")) {
+							string baud = MainDeviceProfileNode->ToElement()->GetText();
+							machine->mainDeviceProfile.serialPara.baud = strtoul(baud.c_str(), NULL, 10);
+						} else if(!strcmp(MainDeviceProfileNode->Value(),"DataBits")) {
+							string DataBits = MainDeviceProfileNode->ToElement()->GetText();
+							machine->mainDeviceProfile.serialPara.data_bit = strtoul(DataBits.c_str(), NULL, 10);
+						} else if(!strcmp(MainDeviceProfileNode->Value(),"StopBits")) {
+							string StopBits = MainDeviceProfileNode->ToElement()->GetText();
+							if(StopBits == "One") 
+								machine->mainDeviceProfile.serialPara.stop_bit = 1;
+							else if(StopBits == "Two") 
+								machine->mainDeviceProfile.serialPara.stop_bit = 2;
+						} else if(!strcmp(MainDeviceProfileNode->Value(),"Parity")) {
+							string Parity = MainDeviceProfileNode->ToElement()->GetText();
+							if(Parity == "None")
+								machine->mainDeviceProfile.serialPara.parity = 'N';
+							else if (Parity == "Odd") 
+								machine->mainDeviceProfile.serialPara.parity = 'O';
+							else if (Parity == "Even")
+								machine->mainDeviceProfile.serialPara.parity = 'E';
+							else if (Parity == "Mark")
+								machine->mainDeviceProfile.serialPara.parity = 'M';
+							else if (Parity == "Space")
+								machine->mainDeviceProfile.serialPara.parity = 'S';
+							else 
+								printf("%s:%d  Parity is error!\n",__FILE__,__LINE__);
 
 						} else if(!strcmp(MainDeviceProfileNode->Value(),"Priority")) {
 							machine->mainDeviceProfile.Priority = MainDeviceProfileNode->ToElement()->GetText();

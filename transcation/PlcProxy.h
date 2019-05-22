@@ -16,12 +16,7 @@ using namespace lux;
 class PlcProxy;
 /////////////////////////// PclContex /////////////////////////
 
-typedef struct {
-	int baud;
-	char parity;
-	int data_bit;
-	int stop_bit;
-}SerialParameter_t;
+
 
 class MachineContex
 {
