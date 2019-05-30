@@ -1,66 +1,184 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<curl/curl.h>
-#include"Http.h"
 
-//////////////////////////////////////// HttpPoster /////////////////////////////////
-void HttpPoster::UpdateInfo()
+#include "Http.h"
+#include "curl/curl.h"
+#include <string>
+ 
+CHttpClient::CHttpClient(void) : 
+m_bDebug(false)
 {
-    char szJsonData[1024];
-    char sendbuf[] = "{\"abc\":\"hello\"}";
-    memset(szJsonData, 0, sizeof(szJsonData));
-    std::string strJson;
-    strJson = "{";
-    strJson += "\"user_name\" : \"test\",";
-    strJson += "\"password\" : \"test123\"";
-    strJson += "}";
-    strcpy(szJsonData, strJson.c_str());
-    try
-    {
-        CURL *pCurl = NULL;
-        CURLcode res;
-        // In windows, this will init the winsock stuff
-        curl_global_init(CURL_GLOBAL_ALL);
-
-        // get a curl handle
-        pCurl = curl_easy_init();
-        if (NULL != pCurl)
-        {
-            // 设置超时时间为1秒
-            curl_easy_setopt(pCurl, CURLOPT_TIMEOUT, 1);
-
-            // First set the URL that is about to receive our POST.
-            // This URL can just as well be a
-            // https:// URL if that is what should receive the data.
-            curl_easy_setopt(pCurl, CURLOPT_URL, "http://10.10.80.11:8080");
-            //curl_easy_setopt(pCurl, CURLOPT_URL, "http://192.168.0.2/posttest.cgi");
-
-            // 设置http发送的内容类型为JSON
-            curl_slist *plist = curl_slist_append(NULL,
-                "Content-Type:application/json;charset=UTF-8");
-            curl_easy_setopt(pCurl, CURLOPT_HTTPHEADER, plist);
-
-            // 设置要POST的JSON数据
-            curl_easy_setopt(pCurl, CURLOPT_POSTFIELDS, sendbuf);
-
-            // Perform the request, res will get the return code
-            res = curl_easy_perform(pCurl);
-            // Check for errors
-            if (res != CURLE_OK)
-            {
-                printf("curl_easy_perform() failed:%s\n", curl_easy_strerror(res));
-            }
-            // always cleanup
-            curl_easy_cleanup(pCurl);
-        }
-        curl_global_cleanup();
-    }
-    catch (std::exception &ex)
-    {
-        printf("curl exception %s.\n", ex.what());
+ 
+}
+ 
+CHttpClient::~CHttpClient(void)
+{
+ 
+}
+ 
+static int OnDebug(CURL *, curl_infotype itype, char * pData, size_t size, void *)
+{
+    if(itype == CURLINFO_TEXT){
+        //printf("[TEXT]%s\n", pData);
+    } else if(itype == CURLINFO_HEADER_IN){
+        printf("[HEADER_IN]%s\n", pData);
+    } else if(itype == CURLINFO_HEADER_OUT){
+        printf("[HEADER_OUT]%s\n", pData);
+    } else if(itype == CURLINFO_DATA_IN) {
+        printf("[DATA_IN]%s\n", pData);
+    } else if(itype == CURLINFO_DATA_OUT) {
+        printf("[DATA_OUT]%s\n", pData);
     }
 
+    return 0;
+}
+ 
+static size_t OnWriteData(void* buffer, size_t size, size_t nmemb, void* lpVoid)
+{
+    std::string* str = dynamic_cast<std::string*>((std::string *)lpVoid);
+    if( NULL == str || NULL == buffer ){
+        return -1;
+    }
+ 
+    char* pData = (char*)buffer;
+    str->append(pData, size * nmemb);
+    return nmemb;
+}
+ 
+int CHttpClient::Post(const std::string & strUrl, const std::string & strPost, std::string & strResponse)
+{
+    CURLcode res;
+    CURL* curl = curl_easy_init();
+    if(NULL == curl){
+        return CURLE_FAILED_INIT;
+    }
+
+    if(m_bDebug){
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+        curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, OnDebug);
+    }
+
+    curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str());
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, strPost.c_str());
+    curl_easy_setopt(curl, CURLOPT_READFUNCTION, NULL);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, OnWriteData);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&strResponse);
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 3);
+    res = curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+    return res;
+}
+ 
+int CHttpClient::Get(const std::string & strUrl, std::string & strResponse)
+{
+    CURLcode res;
+    CURL* curl = curl_easy_init();
+    if(NULL == curl){
+        return CURLE_FAILED_INIT;
+    }
+
+    if(m_bDebug){
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+        curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, OnDebug);
+    }
+
+    curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str());
+    curl_easy_setopt(curl, CURLOPT_READFUNCTION, NULL);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, OnWriteData);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&strResponse);
+    /**
+    * 当多个线程都使用超时处理的时候，同时主线程中有sleep或是wait等操作。
+    * 如果不设置这个选项，libcurl将会发信号打断这个wait从而导致程序退出。
+    */
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 3);
+    res = curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+    return res;
+}
+ 
+int CHttpClient::Posts(const std::string & strUrl, const std::string & strPost, std::string & strResponse, const char * pCaPath)
+{
+    CURLcode res;
+    CURL* curl = curl_easy_init();
+    if(NULL == curl)
+    {
+        return CURLE_FAILED_INIT;
+    }
+
+    if(m_bDebug)
+    {
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+        curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, OnDebug);
+    }
+
+    curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str());
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, strPost.c_str());
+    curl_easy_setopt(curl, CURLOPT_READFUNCTION, NULL);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, OnWriteData);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&strResponse);
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+    if(NULL == pCaPath){
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, false);
+    } else {
+        //缺省情况就是PEM，所以无需设置，另外支持DER
+        //curl_easy_setopt(curl,CURLOPT_SSLCERTTYPE,"PEM");
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
+        curl_easy_setopt(curl, CURLOPT_CAINFO, pCaPath);
+    }
+
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 3);
+    res = curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+    return res;
+}
+ 
+int CHttpClient::Gets(const std::string & strUrl, std::string & strResponse, const char * pCaPath)
+{
+    CURLcode res;
+    CURL* curl = curl_easy_init();
+    if(NULL == curl){
+        return CURLE_FAILED_INIT;
+    }
+
+    if(m_bDebug){
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+        curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, OnDebug);
+    }
+    curl_easy_setopt(curl, CURLOPT_URL, strUrl.c_str());
+    curl_easy_setopt(curl, CURLOPT_READFUNCTION, NULL);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, OnWriteData);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&strResponse);
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+    if(NULL == pCaPath){
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, false);
+    } else {
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
+        curl_easy_setopt(curl, CURLOPT_CAINFO, pCaPath);
+    }
+
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 3);
+    res = curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+    return res;
+}
+ 
+///////////////////////////////////////////////////////////////////////////////////////////////
+ 
+void CHttpClient::SetDebug(bool bDebug)
+{
+    m_bDebug = bDebug;
 }
 
 
+void http_test()
+{
+    CHttpClient* client = new CHttpClient();
+}

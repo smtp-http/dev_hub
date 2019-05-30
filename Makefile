@@ -9,7 +9,7 @@ else
 	LDFLAGS += #-lexpat 
 endif
 
-LDFLAGS += -lpthread -ldl  -lstdc++ -lrt  #-lexpat 
+LDFLAGS += -lpthread -ldl  -lstdc++ -lrt   -lcurl -lz#-lexpat 
 # -std=c++11 -pthread -Wl,--no-as-needed
 
 
