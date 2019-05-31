@@ -1,6 +1,8 @@
 {
   "Version": "1.0",
   "UperComputerIp":"172.17.208.22",
+  "UperProtocol" : "http",
+  "UperUrl" : "http://localhost:8080",
   "SerialModbusRtu" : "/dev/ttyUSB0",
   "UperComputerPort" : 9601,
   "PluginLineDesignerXml":"Plugin.LineDesigner.xml",

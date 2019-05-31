@@ -66,6 +66,11 @@ Equipment *BuildSolderCtrl(int equipNum,IUpdateSink *updater)
 	return new SolderCtrl(equipNum,updater);
 }
 
+CHttpClient* GetHttpClient(string url)
+{
+    return new CHttpClient(url);
+}
+
 CommServer *BuildTcpServer(const string ip,short port)
 {
 	TcpServer *server = new TcpServer(ip, port);//"10.10.80.15"
@@ -136,12 +141,14 @@ void transcationTest()
 	
 }
 
+
+
 #include <signal.h>
 
 #include "machine.h"
+
 int main(int argc, char **argv)
 {
-
 
     sigset_t set;
     sigemptyset(&set);

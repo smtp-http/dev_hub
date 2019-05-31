@@ -77,6 +77,14 @@ int SysConfig::LoadConfig()
 		if(root["SerialModbusRtu"].isString() && !root["SerialModbusRtu"].isNull()){
 			SerialModbusRtu = root["SerialModbusRtu"].asString();
 		}
+
+		if(root["UperProtocol"].isString() && !root["UperProtocol"].isNull()){
+			UperProtocol = root["UperProtocol"].asString();
+		}
+
+		if(root["UperUrl"].isString() && !root["UperUrl"].isNull()){
+			UperUrl = root["UperUrl"].asString();
+		}
 		
 #if 0
 	//读取根节点信息

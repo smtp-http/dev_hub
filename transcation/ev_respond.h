@@ -5,6 +5,7 @@
 #include <string.h>
 #include "config.h"
 #include "TcpClient.h"
+#include "Http.h"
 #include "PlcProxy.h"
 
 
@@ -256,7 +257,7 @@ public:
 private:
 	ev_reciver();
 
-	TcpClient* m_client;
+	Client* m_client;
 };
 
 #define EV_DATA_BUFF_LEN 50

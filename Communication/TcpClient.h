@@ -7,19 +7,15 @@
 //#include <algorithm>
 #include "connbase.h"
 #include "eventlooper.h"
+#include "Client.h"
 
 using namespace std;
 using namespace lux;
 
 
-class IFrameRecver
-{
-public:
-	virtual bool OnFrame(string& frame) = 0;
-};
 
 
-class TcpClient : public IConnectorAcceptorSink, public IConnectionSink, public ITimerUserSink
+class TcpClient : public IConnectorAcceptorSink, public IConnectionSink, public ITimerUserSink, public Client
 {
 	string m_peerAddr;
 	short m_peerPort;
@@ -28,7 +24,7 @@ class TcpClient : public IConnectorAcceptorSink, public IConnectionSink, public 
 	TimerID m_timerReconn;
 	TimerID m_timerTest;
 
-	IFrameRecver* m_frameRecver;
+	//IFrameRecver* m_frameRecver;
 	vector<char> m_rdBuffer;
 public:
 	TcpClient(const string &peerAddr, short peerPort)
@@ -38,20 +34,19 @@ public:
 		, m_connection(NULL)
 		, m_timerReconn(-1)
 		, m_timerTest(-1)
-		, m_frameRecver(NULL)
 	{
+		Connect();
 	}
 
-	void SetFrameRecver(IFrameRecver *fr)
-	{
-		m_frameRecver = fr;
-	}
+	
 
-	int SendMsg(const char* buf,unsigned int len)
+	virtual int SendMsg(const char* buf,unsigned int len)
 	{
 		return m_connection->Send(buf, len);
 	}
 
+	
+protected:
 	bool Connect()
 	{
 		if (m_connector)
@@ -59,7 +54,7 @@ public:
 		m_connector = new Connector(m_peerAddr, m_peerPort, this);
 		return m_connector->Connect(3000) == 0; //3 seconds
 	}
-protected:
+
 	virtual void OnConnection(Connection *conn, IConnectorAcceptor *ca){
 		if (conn){
 			//cout << "Client: connected succeed to " << conn->GetPeerAddress() << ":" << conn->GetPeerPort() << endl;

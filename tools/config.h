@@ -27,12 +27,16 @@ public:
 	std::string GetPluginLineDesignerXml(){return pluginLineDesignerXml;}
 	unsigned int GetPollingCycle(){return PollingCycle;}
 	std::string SerialModbusRtu;
+
+	std::string UperProtocol;
+	std::string UperUrl;
 private:
 	SysConfig(){}
 	std::list<IConfigUser *> m_users;
 
 	std::string uperComputerIp;
 	short uperComputerPort;
+
 	std::string plcProtocol;
 	std::string pluginLineDesignerXml;
 	unsigned int PollingCycle;     //ms

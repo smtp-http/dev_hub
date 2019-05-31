@@ -1,8 +1,10 @@
 
 #include "Http.h"
+//#include "config.h"
 #include "curl/curl.h"
 #include <string>
- 
+
+/* 
 CHttpClient::CHttpClient(void) : 
 m_bDebug(false)
 {
@@ -12,7 +14,7 @@ m_bDebug(false)
 CHttpClient::~CHttpClient(void)
 {
  
-}
+}*/
  
 static int OnDebug(CURL *, curl_infotype itype, char * pData, size_t size, void *)
 {
@@ -41,6 +43,15 @@ static size_t OnWriteData(void* buffer, size_t size, size_t nmemb, void* lpVoid)
     char* pData = (char*)buffer;
     str->append(pData, size * nmemb);
     return nmemb;
+}
+
+
+int CHttpClient::SendMsg(const char* buf,unsigned int len)
+{
+    std::string res;
+    std::string strPost(buf,len);
+    this->Post(m_url,strPost, res);
+    return 0;
 }
  
 int CHttpClient::Post(const std::string & strUrl, const std::string & strPost, std::string & strResponse)
@@ -180,5 +191,14 @@ void CHttpClient::SetDebug(bool bDebug)
 
 void http_test()
 {
-    CHttpClient* client = new CHttpClient();
+    string url = "http://localhost:8080";
+    string post = "shit";
+    string res,res1;
+    Client* client = new CHttpClient();
+    //client->Get(url,res);
+    //printf("%s\n",res.c_str());
+    //client->Post(url,post,res1);
+    //printf("%s\n",res1.c_str());
+    client->SendMsg(NULL,0);
 }
+

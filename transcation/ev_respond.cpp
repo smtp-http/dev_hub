@@ -1,5 +1,6 @@
 
 #include "ev_respond.h"
+//#include "Http.h"
 #include <time.h>
 using namespace std;
 
@@ -44,11 +45,21 @@ unsigned long GetTime()
 }
 
 ///////////////////////////////// ev_reciver ////////////////////////////
+extern CHttpClient* GetHttpClient(string url);
 
 ev_reciver::ev_reciver()
-	: m_client(new TcpClient(SysConfig::Instance().GetUperComputerIp(),(short)SysConfig::Instance().GetUperComputerPort()))
+//	: m_client(new TcpClient(SysConfig::Instance().GetUperComputerIp(),(short)SysConfig::Instance().GetUperComputerPort()))
 {
-	m_client->Connect();
+	if(SysConfig::Instance().UperProtocol == "tcp"){
+		m_client = new TcpClient(SysConfig::Instance().GetUperComputerIp(),(short)SysConfig::Instance().GetUperComputerPort());
+		//m_client->Connect();
+	} else if (SysConfig::Instance().UperProtocol == "http") {
+		m_client = GetHttpClient(SysConfig::Instance().UperUrl);
+	} else {
+		printf("%s:%d  UperProtocol is not define!\n",__FILE__,__LINE__);
+		m_client = NULL;
+	}
+	
 	return;
 }
 

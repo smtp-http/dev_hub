@@ -2,18 +2,31 @@
 #define __HTTP_H__
 
 #include <string>
+#include "Client.h"
 
 using namespace std;
 
 
  
-class CHttpClient
+class CHttpClient : public Client
 {
 public:
-	CHttpClient(void);
-	~CHttpClient(void);
+	CHttpClient(void) 
+		: m_bDebug(false)
+	{
+		//m_bDebug = false;
+	}
+	CHttpClient(std::string url)
+		: m_url(url)
+		, m_bDebug(false)
+	{
+
+	}
+	
+	~CHttpClient(void)
+	{}
  
-public:
+	virtual int SendMsg(const char* buf,unsigned int len);
 	/**
 	* @brief HTTP POST请求
 	* @param strUrl 输入参数,请求的Url地址,如:http://www.baidu.com
@@ -55,8 +68,10 @@ public:
  
 private:
 	bool m_bDebug;
+	std::string m_url;
 };
  
+
 
 
 #endif
