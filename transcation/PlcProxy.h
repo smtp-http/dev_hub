@@ -9,7 +9,7 @@
 #define CONNECT_OK  0
 #define CONNECT_NO  1
 
-
+enum PLC_PROTOCOL {PRO_FINS = 0, PRO_RTU};
 
 using namespace lux;
 
@@ -103,8 +103,15 @@ public:
 		return m_connectionStatus;
 	}
 
+	PLC_PROTOCOL GetProtocol()
+	{
+		return m_pro;
+	}
+
 protected:
 	virtual void OnTimer(TimerID tid);
+
+	PLC_PROTOCOL m_pro;
 
 	TimerID m_reconnect;
 
@@ -117,7 +124,10 @@ protected:
 class FinsPlcProxy : public PlcProxy
 {
 public:
-	FinsPlcProxy(){}
+	FinsPlcProxy()
+	{
+		m_pro = PRO_FINS;
+	}
 	virtual ~FinsPlcProxy(){}
 
 	virtual void on_disconnect(MachineContex*);
@@ -131,7 +141,10 @@ public:
 class ModbusRtuPlcProxy : public PlcProxy
 {
 public:
-	ModbusRtuPlcProxy(){}
+	ModbusRtuPlcProxy()
+	{
+		m_pro = PRO_RTU;
+	}
 	virtual ~ModbusRtuPlcProxy(){}
 
 	virtual void on_disconnect(MachineContex*);

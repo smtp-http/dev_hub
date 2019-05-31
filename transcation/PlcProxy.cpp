@@ -150,7 +150,7 @@ int FinsPlcProxy::PlcWriteWorlds(string dataAddr,unsigned char* data,unsigned in
 int FinsPlcProxy::PlcReadWorlds(string plcAddr,unsigned char* recvBuf,unsigned int recvLen)
 {
 	recvLen = recvLen / 2;
-	//cout << "+++ " << plcAddr << "  " << recvLen << endl;
+	//cout << "+++ fins " << plcAddr << "  " << recvLen << endl;
 
 	int ret = finslib_memory_area_read_word((struct fins_sys_tp*)m_plcConnectHandle,plcAddr.c_str(),recvBuf,recvLen);
 
@@ -211,12 +211,15 @@ int ModbusRtuPlcProxy::PlcConnect(MachineContex* mc)
 
 	modbus_set_slave(ctx, mc->m_moduleNum);
 
+	m_connectionStatus = CONNECT_OK;
 }
 
 int ModbusRtuPlcProxy::PlcWriteWorlds(string dataAddr,unsigned char* data,unsigned int len)
 {
 	// fins:dataAddr's flag is a string, like "DM".  for modbus rtu ,it is null string
 	int addr;
+
+	cout << "=========: " << dataAddr << endl;
 
 	try{
 		addr = stoi(dataAddr);
@@ -229,7 +232,7 @@ int ModbusRtuPlcProxy::PlcWriteWorlds(string dataAddr,unsigned char* data,unsign
 
 	int ret = modbus_write_registers(ctx,addr,len,(uint16_t*)data);
 
-	if (ret != 1) {
+	if (ret < 0) {
 		printf("%s:%d  modbus_write_registers error! ret: %d\n",__FILE__,__LINE__,ret);
 		return -1;
 	}
@@ -241,6 +244,8 @@ int ModbusRtuPlcProxy::PlcWriteWorlds(string dataAddr,unsigned char* data,unsign
 int ModbusRtuPlcProxy::PlcReadWorlds(string plcAddr,unsigned char* recvBuf,unsigned int recvLen)
 {
 	int addr;
+
+	//cout << "+++ modbus read worlds" << endl;
 
 	try{
 		addr = stoi(plcAddr);

@@ -86,17 +86,27 @@ void ev_reciver::UpdateEvent(const char* msg,unsigned int len)
 
 int Event::ReadData(unsigned char *rd_buf)
 {
-	string addr = m_flag + m_plcEventAddr;  // fins: flag is a string, like "DM".  for modbus rtu ,it is null string
+	string addr;  // fins: flag is a string, like "DM".  for modbus rtu ,it is null string
+
+	cout << "********* : " << m_plcEventAddr << endl;
 
 	PlcProxy* plcProxy = m_machineContex->GetProxy();//&PlcProxy::Instance();
+
+	if ( plcProxy->GetProtocol() == PRO_FINS){
+		addr = m_flag + m_plcEventAddr; 
+	} else {
+		addr = m_plcEventAddr;
+	}
 	
 	if (m_machineContex == NULL) {
-		printf("m_machineContex is NULL!  return.\n" );
+		printf("%s:%d  m_machineContex is NULL!\n",__FILE__,__LINE__);
 		return -1;
 	}
 
-	if(plcProxy->GetConnectionStatus() == CONNECT_NO)
+	if(plcProxy->GetConnectionStatus() == CONNECT_NO){
+		printf("%s:%d  ConnectionStatus is CONNECT_NO!\n",__FILE__,__LINE__);
 		return -2;
+	}
 
 	return plcProxy->PlcReadWorlds(addr,rd_buf,m_plcDataSize);
 }
@@ -111,7 +121,13 @@ void Event::SendEapData(unsigned char* data)
 	}
 
 
-	string addr = m_flag + m_eapEventAddr;                 // fins: flag is a string, like "DM".  for modbus rtu ,it is null string
+	string addr;                  // fins: flag is a string, like "DM".  for modbus rtu ,it is null string
+	if ( plcProxy->GetProtocol() == PRO_FINS){
+		addr = m_flag + m_eapEventAddr;
+	} else {
+		addr = m_plcEventAddr;
+	}
+	
 	plcProxy->PlcWriteWorlds(addr,data,m_eapDataSize);
 }
 
