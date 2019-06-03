@@ -260,7 +260,7 @@ private:
 	Client* m_client;
 };
 
-#define EV_DATA_BUFF_LEN 50
+#define EV_DATA_BUFF_LEN 1000
 
 class Event {
 public:

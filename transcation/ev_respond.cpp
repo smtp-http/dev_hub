@@ -88,7 +88,7 @@ int Event::ReadData(unsigned char *rd_buf)
 {
 	string addr;  // fins: flag is a string, like "DM".  for modbus rtu ,it is null string
 
-	cout << "********* : " << m_plcEventAddr << endl;
+	//cout << "********* : " << m_plcEventAddr << endl;
 
 	PlcProxy* plcProxy = m_machineContex->GetProxy();//&PlcProxy::Instance();
 
@@ -257,15 +257,15 @@ void Ev_AlarmCode::SniffingPlcEvent()
 		
 
 		m_sequenceID = BLEndianUshort(ac_plc->SequenceID,m_machineContex->WordSwap);
-		//cout << "---- s id: " << m_sequenceID << endl;
-		//cout << "  Content: " << ac_plc->Content<<endl;
-		//cout << "  ev_code: " << ac_plc->EventCode << endl;
+		cout << "---- s id: " << m_sequenceID << endl;
+		cout << "  Content: " << ac_plc->Content<<endl;
+		cout << "  ev_code: " << ac_plc->EventCode << endl;
 
 		for(int i = 0;i < ALARM_CONTENT_LEN;i ++){
 			cout << BLEndianUshort(ac_plc->Content[i],m_machineContex->WordSwap) << " ";
 			for(int j = 0;j < 16;j ++) {
 				if((BLEndianUshort(ac_plc->Content[i],m_machineContex->WordSwap) & (0x0001 << j)) != 0){
-					cout << " *******$:  " << i << " " << j << endl;
+//					cout << " *******$:  " << i << " " << j << endl;
 					if(m_machineContex != NULL) {
 						PlcAlarmInfo_t* alarm = m_machineContex->PlcAlarmCodeList[i*0x10 + j];
 						if(alarm != NULL){
@@ -280,7 +280,7 @@ void Ev_AlarmCode::SniffingPlcEvent()
 							alarm_info["Level"] = alarm->Level.c_str();
 
 							alarmList.append(alarm_info);
-							//cout << alarm->Name << " " << alarm->Enable << " " << alarm->WordOffset << " " << alarm->BitOffset;
+							cout << alarm->Name << " " << alarm->Enable << " " << alarm->WordOffset << " " << alarm->BitOffset;
 						}
 					}
 				}

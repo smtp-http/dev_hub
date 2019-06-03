@@ -205,7 +205,7 @@ int ModbusRtuPlcProxy::PlcConnect(MachineContex* mc)
 	m_plcConnectHandle = modbus_new_rtu(SysConfig::Instance().SerialModbusRtu.c_str(), mc->m_serial->baud,mc->m_serial->parity, mc->m_serial->data_bit, mc->m_serial->stop_bit);
 
 	modbus_t *ctx = (modbus_t*)m_plcConnectHandle;
-	modbus_set_debug(ctx, TRUE);
+	modbus_set_debug(ctx, FALSE);
 	modbus_set_error_recovery(ctx,
 							(modbus_error_recovery_mode)(MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL));
 
@@ -219,7 +219,7 @@ int ModbusRtuPlcProxy::PlcWriteWorlds(string dataAddr,unsigned char* data,unsign
 	// fins:dataAddr's flag is a string, like "DM".  for modbus rtu ,it is null string
 	int addr;
 
-	cout << "=========: " << dataAddr << endl;
+	//cout << "=========: " << dataAddr << endl;
 
 	try{
 		addr = stoi(dataAddr);

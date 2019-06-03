@@ -84,25 +84,14 @@ void Machine::EventPolling()
 {
 	map<string,Event*>::iterator it; 
 
-	cout << "################## " << m_mainEvents.size() << endl;
-	//cout << "######-#+++####### " << m_stationsEvents.size() << endl;
-	//it = m_mainEvents.begin();
-
     for(it=m_mainEvents.begin();it!=m_mainEvents.end();) {
-    	//it->second->SniffingPlcEvent();
     	Event* ev = (Event*)it->second;
-    	cout << " -------- - "  << it->first << "  " ;
-    	printf("===+== 0x%x   \n",it);
     	ev->SniffingPlcEvent();
-    	//cout << "***=== " << it << endl;
-    	printf("====== 0x%x   \n",it);
-    	//cout << "******+ " << it->first << "  " << it->second << "  "  << endl;
     	it ++;
     }
 
     for(it=m_stationsEvents.begin();it!=m_stationsEvents.end();++it) {
-    	//it->second->SniffingPlcEvent();
-    	cout << "**---- " << it->first << "  " << it->second << endl;
+    	
     	Event* ev = (Event*)it->second;
     	ev->SniffingPlcEvent();
     }
