@@ -42,7 +42,8 @@ public:
 
 	virtual int SendMsg(const char* buf,unsigned int len)
 	{
-		return m_connection->Send(buf, len);
+		if(m_connection != NULL)
+			return m_connection->Send(buf, len);
 	}
 
 	

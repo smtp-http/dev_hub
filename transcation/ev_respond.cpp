@@ -76,7 +76,8 @@ ev_reciver& ev_reciver::GetInstance()
 
 void ev_reciver::UpdateEvent(const char* msg,unsigned int len)
 {
-	m_client->SendMsg(msg,len);
+	if(m_client != NULL)
+		m_client->SendMsg(msg,len);
 }
 
 
