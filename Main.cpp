@@ -45,6 +45,8 @@ const char *__process__ = "dev_collecter";
 const char *__version__ = "0.1.0";
 
 
+extern CHttpClient* GetHttpClient(string url);
+
 
 string task1(int i){
 	//for(;;){
@@ -146,6 +148,7 @@ void transcationTest()
 #include <signal.h>
 
 #include "machine.h"
+#include "autolock.h"
 
 int main(int argc, char **argv)
 {
@@ -158,7 +161,9 @@ int main(int argc, char **argv)
 	SysConfig::Instance().LoadConfig();
 	//MachineScheduler& m = MachineScheduler::GetInstance("demotest.xml");   
 	//cout << "--------: " << SysConfig::Instance().GetPluginLineDesignerXml() << "  --- : " << SysConfig::Instance().GetUperComputerIp() << endl;
-	MachineScheduler& m = MachineScheduler::GetInstance(SysConfig::Instance().GetPluginLineDesignerXml());
+	//MachineScheduler& m = MachineScheduler::GetInstance(SysConfig::Instance().GetPluginLineDesignerXml());
+	AutoLockInfoProcess* aip = new AutoLockInfoProcess;
+
 #if 0
 	vector<StationEventProfile_t*> *m = GetAllStationEventProfile("demotest.xml");
 	//TranscationManager &tm = TranscationManager::GetInstance();
