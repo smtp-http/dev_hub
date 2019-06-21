@@ -10,6 +10,10 @@ else
 endif
 
 LDFLAGS +=  -lpthread -ldl  -lstdc++ -lrt #,-Bstatic   -lcurl #-lz#-lexpat 
+
+ifndef TOOLCHAIN_NAME
+LDFLAGS += -lcurl -lz
+endif
 # -std=c++11 -pthread -Wl,--no-as-needed
 
 
@@ -23,8 +27,10 @@ export CXXFLAGS := -Wall -g -std=c++11 -D_GLIBCXX_USE_NANOSLEEP -Wl,--no-as-need
 TARGET = dev_collecter
 OBJS = Main.o#AppSimulator.o
 
-LOCAL_LIBS :=  ./tools/libtools.a ./Communication/libconn.a ./device/libdevice.a  ./equipment/libequipment.a ./transcation/libtranscation.a $(TOPDIR)/vendor/$(LIBSDIR)/libcurl.a
-
+LOCAL_LIBS :=  ./tools/libtools.a ./Communication/libconn.a ./device/libdevice.a  ./equipment/libequipment.a ./transcation/libtranscation.a 
+ifdef TOOLCHAIN_NAME
+LOCAL_LIBS += $(TOPDIR)/vendor/$(LIBSDIR)/libcurl.a
+endif
 #./command/libcommand.a  ./mqtt/libmqtt.a 
 
 LIBSCAN = libscanner.a
