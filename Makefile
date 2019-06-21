@@ -9,7 +9,7 @@ else
 	LDFLAGS += #-lexpat 
 endif
 
-LDFLAGS += -lpthread -ldl  -lstdc++ -lrt   -lcurl -lz#-lexpat 
+LDFLAGS +=  -lpthread -ldl  -lstdc++ -lrt #,-Bstatic   -lcurl #-lz#-lexpat 
 # -std=c++11 -pthread -Wl,--no-as-needed
 
 
@@ -23,7 +23,7 @@ export CXXFLAGS := -Wall -g -std=c++11 -D_GLIBCXX_USE_NANOSLEEP -Wl,--no-as-need
 TARGET = dev_collecter
 OBJS = Main.o#AppSimulator.o
 
-LOCAL_LIBS :=  ./tools/libtools.a ./Communication/libconn.a ./device/libdevice.a  ./equipment/libequipment.a ./transcation/libtranscation.a
+LOCAL_LIBS :=  ./tools/libtools.a ./Communication/libconn.a ./device/libdevice.a  ./equipment/libequipment.a ./transcation/libtranscation.a $(TOPDIR)/vendor/$(LIBSDIR)/libcurl.a
 
 #./command/libcommand.a  ./mqtt/libmqtt.a 
 
